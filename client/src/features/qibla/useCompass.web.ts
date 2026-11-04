@@ -70,15 +70,16 @@ export function useCompass(enabled = true): CompassState {
       setState((s) => ({ ...s, status: 'ok', heading, accuracy }));
     };
 
-    const absolute = 'ondeviceorientationabsolute' in window;
-    const name = absolute ? 'deviceorientationabsolute' : 'deviceorientation';
-    window.addEventListener(name, onEvent, true);
+    // Chrome (Android) fires the absolute variant; Safari only the plain one
+    // (with webkitCompassHeading). Listen to both; relative-only events are ignored.
+    const names = ['deviceorientationabsolute', 'deviceorientation'] as const;
+    for (const n of names) window.addEventListener(n, onEvent, true);
     const timer = setTimeout(() => {
       if (!got) setState((s) => ({ ...s, status: 'unsupported' }));
     }, 1500);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener(name, onEvent, true);
+      for (const n of names) window.removeEventListener(n, onEvent, true);
     };
   }, [enabled, granted, touch]);
 

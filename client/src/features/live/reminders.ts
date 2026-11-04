@@ -1,4 +1,3 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { create } from 'zustand';
 import { kv } from '@/lib/storage';
@@ -44,6 +43,7 @@ export async function toggleLiveReminder(stream: LiveStream): Promise<ToggleResu
   const current = useLiveReminders.getState().reminders[stream.videoId];
   if (current) {
     if (current.notificationId && Platform.OS !== 'web') {
+      const Notifications = await import('expo-notifications');
       await Notifications.cancelScheduledNotificationAsync(current.notificationId).catch(() => {});
     }
     const { [stream.videoId]: _removed, ...rest } = useLiveReminders.getState().reminders;
@@ -55,6 +55,8 @@ export async function toggleLiveReminder(stream: LiveStream): Promise<ToggleResu
   let notificationId: string | null = null;
   const at = stream.scheduledStartAt ? new Date(stream.scheduledStartAt) : null;
   if (Platform.OS !== 'web' && at && at.getTime() > Date.now() + 30_000) {
+    // Loaded lazily: importing expo-notifications on web logs a warning.
+    const Notifications = await import('expo-notifications');
     let perm = await Notifications.getPermissionsAsync();
     if (!perm.granted && perm.canAskAgain) perm = await Notifications.requestPermissionsAsync();
     if (!perm.granted) return 'denied';

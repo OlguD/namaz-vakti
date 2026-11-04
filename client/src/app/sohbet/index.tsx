@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { hydrateSeen, useRoomPreviews, useRooms, useSeen } from '@/features/chat/api';
@@ -20,7 +20,9 @@ export default function ChatRoomsScreen() {
   const rooms = useRooms();
   const online = useOnline();
   const accepted = useFlags((s) => s.chatRulesAccepted);
-  const [rulesOpen, setRulesOpen] = useState(!accepted);
+  // Settings links here with ?kurallar=1 to show the rules again.
+  const { kurallar } = useLocalSearchParams<{ kurallar?: string }>();
+  const [rulesOpen, setRulesOpen] = useState(!accepted || kurallar === '1');
   const [pending, setPending] = useState<string | null>(null);
   const list = rooms.data ?? [];
   const previews = useRoomPreviews(list.map((r) => r.id));

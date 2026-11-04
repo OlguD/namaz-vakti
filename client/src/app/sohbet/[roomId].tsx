@@ -95,7 +95,7 @@ export default function ChatRoomScreen() {
               v="title"
               accessibilityRole="header"
               numberOfLines={1}
-              style={arabicRoom ? { fontFamily: fonts.arabic, fontSize: 24, lineHeight: 32 } : { fontSize: 22, lineHeight: 27 }}
+              style={arabicRoom ? { fontFamily: fonts.arabic, fontSize: 24, lineHeight: 32, textAlign: 'left' } : { fontSize: 22, lineHeight: 27 }}
             >
               {room?.name ?? ''}
             </Txt>
@@ -180,7 +180,7 @@ export default function ChatRoomScreen() {
               draft={draft}
               setDraft={setDraft}
               onSend={send}
-              onLogin={() => router.push('/giris' as never)}
+              onLogin={() => router.push({ pathname: '/giris', params: { next: `/sohbet/${roomId}` } })}
               onRefreshAccount={chat.refreshAccount}
             />
           </View>
