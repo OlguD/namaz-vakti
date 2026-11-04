@@ -59,6 +59,11 @@ export const envSchema = z.object({
   NOMINATIM_BASE_URL: z.url().default('https://nominatim.openstreetmap.org'),
   NOMINATIM_EMAIL: z.string().optional(),
   OVERPASS_BASE_URL: z.url().default('https://overpass-api.de/api/interpreter'),
+  ALADHAN_BASE_URL: z.url().default('https://api.aladhan.com'),
+  TCMB_BASE_URL: z.url().default('https://www.tcmb.gov.tr'),
+  /** goldapi.io key for gold/silver spot prices (zakat). Without it zakat prices stay manual. */
+  GOLDAPI_KEY: z.string().optional(),
+  GOLDAPI_BASE_URL: z.url().default('https://www.goldapi.io'),
 
   YOUTUBE_API_KEY: z.string().optional(),
   LIVE_POLL_CRON: z.string().default('*/2 * * * *'),

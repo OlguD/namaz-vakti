@@ -10,6 +10,8 @@ import { MosquesService } from '../mosques/mosques.service.js';
 import { type BroadcastJob, NotificationsService } from '../notifications/notifications.service.js';
 import { PrayerTimesService } from '../prayer-times/prayer-times.service.js';
 import { WorshipService } from '../worship/worship.service.js';
+import { CalendarService } from '../calendar/calendar.service.js';
+import { MetalPricesService } from '../content/metal-prices.service.js';
 
 /** Pause between upstream calls during full syncs, to stay polite to free services. */
 const SYNC_DELAY_MS = 400;
@@ -175,7 +177,11 @@ export class NotificationsProcessor extends WorkerHost {
 
 @Processor(QUEUES.maintenance, { concurrency: 1 })
 export class MaintenanceProcessor extends WorkerHost {
-  constructor(private readonly worship: WorshipService) {
+  constructor(
+    private readonly worship: WorshipService,
+    private readonly calendar: CalendarService,
+    private readonly metals: MetalPricesService,
+  ) {
     super();
   }
 
@@ -183,6 +189,10 @@ export class MaintenanceProcessor extends WorkerHost {
     switch (job.name) {
       case JOBS.pruneSyncBatches:
         return { pruned: await this.worship.pruneSyncBatches() };
+      case JOBS.syncReligiousDays:
+        return this.calendar.syncUpcoming();
+      case JOBS.refreshMetalPrices:
+        return this.metals.refresh();
       default:
         throw new Error(`Unknown job ${job.name}`);
     }

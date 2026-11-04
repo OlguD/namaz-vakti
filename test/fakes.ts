@@ -173,3 +173,40 @@ export class FakeExpo {
     return Object.fromEntries(ids.map((id) => [id, { status: 'ok' as const }]));
   }
 }
+
+/** Aladhan DIYANET month calendar built from known month starts. */
+export class FakeAladhan {
+  calls = 0;
+  down = false;
+  starts: Record<string, string> = {};
+
+  async month(month: number, year: number) {
+    this.calls += 1;
+    if (this.down) {
+      throw new UpstreamError('aladhan', 'fake outage');
+    }
+    const start = this.starts[`${year}-${month}`];
+    if (!start) {
+      throw new UpstreamError('aladhan', 'unknown month', 404, false);
+    }
+    return { start, length: 30 };
+  }
+}
+
+export class FakeTcmb {
+  rate = 42;
+  async usdTry() {
+    return { rate: this.rate, date: '2026-11-04' };
+  }
+}
+
+export class FakeGoldApi {
+  configured = true;
+  gold = 4000;
+  silver = 48;
+  calls = 0;
+  async ounceUsd(metal: 'XAU' | 'XAG') {
+    this.calls += 1;
+    return metal === 'XAU' ? this.gold : this.silver;
+  }
+}

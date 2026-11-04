@@ -2,7 +2,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 import { AppConfig } from '../config/app-config.service.js';
-import { JOBS, QUEUES } from '../jobs/queues.js';
+import { jobId, JOBS, QUEUES } from '../jobs/queues.js';
 
 /**
  * Recurring jobs live in Redis as BullMQ job schedulers, so they fire exactly once
@@ -60,6 +60,18 @@ export class SchedulesService implements OnApplicationBootstrap {
         },
       ),
       // Every 15 minutes — Expo delivery receipts (removes uninstalled devices).
+      // Daily 04:17 — hijri month starts + holy days for this and next hijri year.
+      this.maintenance.upsertJobScheduler(
+        'sync-religious-days',
+        { pattern: '17 4 * * *' },
+        { name: JOBS.syncReligiousDays },
+      ),
+      // Weekdays 07:23 and 13:23 UTC (10:23 / 16:23 TR, after TCMB's 15:30 bulletin).
+      this.maintenance.upsertJobScheduler(
+        'refresh-metal-prices',
+        { pattern: '23 7,13 * * 1-5' },
+        { name: JOBS.refreshMetalPrices },
+      ),
       // Daily 03:37 — forget dhikr-sync idempotency keys older than 30 days.
       this.maintenance.upsertJobScheduler(
         'prune-sync-batches',
@@ -74,6 +86,14 @@ export class SchedulesService implements OnApplicationBootstrap {
         },
       ),
     ]);
+    // Fill the calendar and prices right after a deploy instead of waiting for the next tick.
+    const today = new Date().toISOString().slice(0, 10);
+    await this.maintenance.add(JOBS.syncReligiousDays, {}, { jobId: jobId('days', 'boot', today) });
+    await this.maintenance.add(
+      JOBS.refreshMetalPrices,
+      {},
+      { jobId: jobId('metals', 'boot', today) },
+    );
     this.logger.log('Recurring schedules registered');
   }
 }

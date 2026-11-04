@@ -36,6 +36,13 @@
       "when": 1793790371305,
       "tag": "0004_worship_quran_content",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793791195519,
+      "tag": "0005_automatic_calendar_and_prices",
+      "breakpoints": true
     }
   ]
 }

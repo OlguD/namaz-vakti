@@ -504,7 +504,7 @@ describe('Worship, Qur’an, content and settings (e2e)', () => {
   });
 
   describe('content and settings', () => {
-    it('serves duas, esma and an empty holy-day list until Diyanet data is imported', async () => {
+    it('serves duas, esma and the holy-day list', async () => {
       const duas = await ctx.http().get('/v1/content/duas').expect(200);
       expect(duas.body.categories).toHaveLength(8);
       expect(duas.body.duas.length).toBeGreaterThan(5);
@@ -521,7 +521,7 @@ describe('Worship, Qur’an, content and settings (e2e)', () => {
       expect(esma.body[1]).toMatchObject({ no: 2, transliteration: 'er-Rahmân' });
 
       const days = await ctx.http().get('/v1/content/religious-days').expect(200);
-      expect(days.body).toEqual([]);
+      expect(Array.isArray(days.body)).toBe(true);
     });
 
     it('lets admins import holy days and set zakat prices; others get 403', async () => {
@@ -533,7 +533,12 @@ describe('Worship, Qur’an, content and settings (e2e)', () => {
       const adminAuth = bearer({ accessToken: admin.body.tokens.accessToken });
       const user = await verifiedUser(ctx);
 
-      const day = { date: addDays(today, 30), key: 'test-kandili', nameTr: 'Test Kandili' };
+      const day = {
+        date: addDays(today, 30),
+        key: 'test-kandili',
+        hijriYear: 1448,
+        nameTr: 'Test Kandili',
+      };
       await ctx
         .http()
         .post('/v1/admin/content/religious-days')
@@ -553,9 +558,9 @@ describe('Worship, Qur’an, content and settings (e2e)', () => {
         .send([{ date: 'x' }])
         .expect(400);
       const days = await ctx.http().get('/v1/content/religious-days').expect(200);
-      expect(days.body).toEqual([
-        expect.objectContaining({ key: 'test-kandili', nameTr: 'Test Kandili' }),
-      ]);
+      expect(days.body).toContainEqual(
+        expect.objectContaining({ key: 'test-kandili', nameTr: 'Test Kandili', source: 'manual' }),
+      );
 
       const rates = await ctx
         .http()

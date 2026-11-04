@@ -11,8 +11,9 @@ import { ContentService } from './content.service.js';
 
 /**
  * Loads the editorial files in ./content into the database (idempotent upserts):
- *   duas.json, esma.json, religious-days.json (only if present — the .example
- *   file is never imported, its dates are not authoritative).
+ *   duas.json, esma.json and, optionally, religious-days.json. Holy days are
+ *   generated automatically; that file only holds admin overrides (stored as
+ *   `manual`, each with its hijriYear).
  */
 export async function importContent(
   db: Database,

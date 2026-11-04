@@ -54,7 +54,7 @@ cp .env.example .env                    # JWT_ACCESS_SECRET'ı değiştir
 docker compose up -d postgres redis     # PostGIS + Redis
 npm ci
 npm run db:migrate:dev                  # şemayı kur
-npm run content:import:dev              # dualar, esma (ve varsa dini günler)
+npm run content:import:dev              # dualar ve esma (dini günleri worker üretir)
 npm run start:dev                       # API → http://localhost:3000
 npm run start:worker:dev                # ayrı terminalde worker
 ```
@@ -113,15 +113,46 @@ Veriler hesaba bağlıdır; telefon ve web aynı veriyi görür. Anonim hesaplar
 - **Ortak hatim:** Aynı cüze aynı anda dokunan iki kişiden yalnızca biri alır, diğeri `409` görür. Üye olmayan biri grubu `404` olarak görür; grup kimlikleri dışarıdan yoklanamaz. Davet kodu döndürülebilir. Sahip ayrılırsa en eski üye sahip olur, son üye ayrılınca grup silinir.
 - **Ayarlar** tek bir sürümlü belgedir (`GET/PUT /v1/me/settings`). İki cihaz aynı anda değiştirirse ikincisi `409` ve güncel belgeyi alır, birleştirip tekrar gönderir. Tanınmayan alanlar reddedilir.
 
-## İçerik (dualar, Esmaü'l-Hüsna, dini günler)
+## İçerik (dualar, Esmaü'l-Hüsna)
 
-İçerik `content/` klasöründeki JSON dosyalarından yüklenir: `npm run content:import`. Docker'da `migrate` servisi bunu otomatik yapar. Yükleme idempotenttir, tekrar çalıştırmak güvenlidir. Admin uçları (`/v1/admin/content/*`) ile mağaza güncellemesi olmadan düzenlenebilir.
+Dualar ve Esmaü'l-Hüsna `content/` klasöründeki JSON dosyalarından yüklenir: `npm run content:import`. Docker'da `migrate` servisi bunu otomatik yapar. Yükleme idempotenttir, tekrar çalıştırmak güvenlidir. Admin uçları (`/v1/admin/content/*`) ile mağaza güncellemesi olmadan düzenlenebilir.
 
 > ⚠️ **Yayından önce:** `duas.json` ve `esma.json` ilk taslaktır (Arapça metinler ve isimler tasarımdan; anlamlar ve kaynaklar taslak). Dini metinlerin ehil biri tarafından kontrol edilmesi şart.
->
-> **Dini günler** otomatik doldurulmaz. `religious-days.example.json` içindeki tarihler tasarımdan alınmış örneklerdir. Diyanet'in yayımladığı yıllık listeden `religious-days.json` dosyasını oluşturup içe aktar ya da `POST /v1/admin/content/religious-days` ile yükle.
 
-**Zekât:** Gram altın ve gümüş fiyatını admin `PUT /v1/admin/content/zakat-rates` ile girer; nisap varsayılanı 80,18 g altındır. Otomatik fiyat beslemesi yok. İstersen lisanslı bir fiyat API'si eklenebilir.
+## Dini günler (otomatik)
+
+Kimsenin tarih girmesine gerek yok; worker her gün bu hicri yılın ve gelecek hicri yılın günlerini üretir.
+
+1. **Hicri ay başlangıçları:**
+   - Önce **Diyanet'in kendi günlük tablolarından** alınır. Emushaf'tan çekilen her vakit satırında Diyanet'in hicri tarihi de var; "4 Kasım 2026 = 24.5.1448" gibi bir satırdan ayın başlangıcı çıkarılır. Bu kaynak esastır.
+   - Tablo henüz o aya ulaşmadıysa **Aladhan API'nin `DIYANET` takvim yöntemi** kullanılır.
+   - İki kaynak çakıştığında karşılaştırılır: uyuşuyorlarsa ay `verified` olur, uyuşmuyorlarsa Diyanet kazanır ve fark admin ekranına `conflict` olarak düşer (`GET /v1/admin/content/calendar-status`).
+2. **Günler Diyanet kuralıyla hesaplanır:**
+   - Kandiller hicri tarihten bir önceki akşam listelenir (ör. Miraç = 27 Recep → 26 Recep akşamı).
+   - Regaip, Recep'in ilk Cuma'sından önceki gecedir.
+   - Diğerleri: Üç Aylar, Ramazan başlangıcı, Kadir Gecesi, iki bayramın arefesi ve günleri, Hicrî Yılbaşı, Aşure.
+
+   Kurallar Diyanet'in yayımladığı 2025–2027 listeleriyle birebir doğrulandı (`src/calendar/religious-days.spec.ts`).
+3. **Admin düzeltmesi:**
+   - Tek bir günü elle düzeltmek için `POST /v1/admin/content/religious-days` kullanılır (`hijriYear` ile). Böyle bir kayıt `manual` olarak saklanır ve otomatik üretim onu **asla ezmez**.
+   - `DELETE …/religious-days/:key/:hijriYear/override` ile otomatiğe dönülür.
+   - `POST …/religious-days/sync` hesaplamayı hemen yeniden çalıştırır.
+
+Aladhan erişilemezse daha önce kaydedilmiş ay başlangıçlarıyla devam edilir; uygulama boş liste görmez.
+
+## Zekât fiyatları (otomatik)
+
+- **Gram fiyatı** = ons fiyatı (USD) ÷ 31,1035 × USD/TRY.
+  - Ons fiyatları **GoldAPI.io**'dan gelir (`GOLDAPI_KEY`; ücretsiz planda ayda 500 istek, biz ayda ~90 kullanıyoruz).
+  - Kur, **TCMB'nin resmi günlük bülteninden** (döviz satış) alınır.
+  - Güncelleme hafta içi 10:23 ve 16:23'te (TR) yapılır.
+- **Nisap** varsayılan olarak 80,18 g altındır ve fiyatla birlikte hesaplanır (`nisabAmount`).
+- **Güvenlik önlemleri:**
+  - Mantıksız fiyatlar ve önceki fiyata göre %25'ten büyük sıçramalar **reddedilir**. Son doğru fiyat yayında kalır, hata admin ekranında görünür (`GET /v1/admin/content/zakat-rates`).
+  - Kabul edilen her ölçüm `metal_price_history` tablosunda saklanır.
+  - Veri 3 günden eskiyse API `stale: true` döner ve uygulama "güncel olmayabilir" uyarısı gösterir.
+- **Admin sabitlemesi:** `PUT /v1/admin/content/zakat-rates` fiyatı sabitler (`source: manual`) ve otomatik güncellemeyi durdurur. `POST …/zakat-rates/auto` otomatiğe döner ve hemen yeniler.
+- `GOLDAPI_KEY` yoksa fiyatlar otomatik gelmez ve admin ekranında bu belirtilir.
 
 ---
 
@@ -197,9 +228,13 @@ Uygulama `code` alanına göre davranmalı, `message` değişebilir. Kodların t
 | `live-poll` | `LIVE_POLL_CRON` (2 dk) | Kanalların canlı durumunu günceller |
 | `push-receipts` | 15 dk'da bir | Silinen uygulamaların push token'larını temizler |
 | `prune-sync-batches` | Her gün 03:37 | 30 günden eski zikir senkron anahtarlarını siler |
+| `sync-religious-days` | Her gün 04:17 (+ her açılışta) | Hicri ay başlangıçlarını ve dini günleri günceller |
+| `refresh-metal-prices` | Hafta içi 07:23 ve 13:23 (+ her açılışta) | Altın/gümüş gram fiyatını ve nisabı günceller |
 
 ## Kotalar ve dış servisler
 
 - **YouTube:** `search.list` hiç kullanılmaz (günde 100 çağrı sınırı var). Keşif RSS üzerinden yapılır (kotasız), durum kontrolü `videos.list` ile (50 video = 1 birim). Bitmiş yayınlar bir daha sorgulanmaz.
 - **Nominatim / Overpass:** Ücretsiz genel sunucular adil kullanım kurallarına tabidir. `OUTBOUND_USER_AGENT` içine iletişim bilgisi yaz. Trafik büyüyünce kendi Nominatim/Overpass sunucunu kurup URL'leri değiştir.
+- **Aladhan / TCMB:** Ücretsiz ve anahtarsız. Erişilemedikleri sürece son bilinen veri kullanılır.
+- **GoldAPI.io:** Ücretsiz plan ayda 500 istek. Anahtar yalnızca sunucudaki `.env` dosyasında durur, repoya girmez.
 - **Emushaf:** SLA'sız topluluk servisi. Uzun vadede resmi Diyanet Awqat Salah API'sine geçmek önerilir (sağlayıcı arayüzü hazır).

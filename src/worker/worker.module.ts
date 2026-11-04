@@ -5,6 +5,7 @@ import { MosquesModule } from '../mosques/mosques.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
 import { PrayerTimesModule } from '../prayer-times/prayer-times.module.js';
 import { WorshipModule } from '../worship/worship.module.js';
+import { ContentModule } from '../content/content.module.js';
 import {
   GeocodeProcessor,
   LiveProcessor,
@@ -25,6 +26,7 @@ import { SchedulesService } from './schedules.service.js';
     LiveModule,
     NotificationsModule,
     WorshipModule,
+    ContentModule,
   ],
   providers: [
     LocationsProcessor,

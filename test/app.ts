@@ -9,11 +9,16 @@ import { YoutubeClient } from '../src/live/youtube.client.js';
 import { MailService } from '../src/mail/mail.service.js';
 import { OverpassClient } from '../src/mosques/overpass.client.js';
 import { EmushafProvider } from '../src/prayer-times/providers/emushaf.provider.js';
+import { AladhanClient } from '../src/calendar/aladhan.client.js';
+import { GoldApiClient, TcmbClient } from '../src/content/metal-prices.clients.js';
 import {
+  FakeAladhan,
   FakeExpo,
+  FakeGoldApi,
   FakeOverpass,
   FakePrayerProvider,
   FakeSocialVerifier,
+  FakeTcmb,
   FakeYoutube,
 } from './fakes.js';
 
@@ -26,6 +31,9 @@ export interface TestContext {
     overpass: FakeOverpass;
     youtube: FakeYoutube;
     expo: FakeExpo;
+    aladhan: FakeAladhan;
+    tcmb: FakeTcmb;
+    goldApi: FakeGoldApi;
   };
   mail: MailService;
   close: () => Promise<void>;
@@ -38,6 +46,9 @@ export async function createTestApp(): Promise<TestContext> {
     overpass: new FakeOverpass(),
     youtube: new FakeYoutube(),
     expo: new FakeExpo(),
+    aladhan: new FakeAladhan(),
+    tcmb: new FakeTcmb(),
+    goldApi: new FakeGoldApi(),
   };
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(EmushafProvider)
@@ -48,6 +59,12 @@ export async function createTestApp(): Promise<TestContext> {
     .useValue(fakes.youtube)
     .overrideProvider(ExpoPushClient)
     .useValue(fakes.expo)
+    .overrideProvider(AladhanClient)
+    .useValue(fakes.aladhan)
+    .overrideProvider(TcmbClient)
+    .useValue(fakes.tcmb)
+    .overrideProvider(GoldApiClient)
+    .useValue(fakes.goldApi)
     .overrideProvider(SocialVerifier)
     .useValue(new FakeSocialVerifier())
     .compile();

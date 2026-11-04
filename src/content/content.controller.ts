@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   Body,
   Controller,
@@ -6,11 +7,16 @@ import {
   Header,
   HttpCode,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
+import type { Queue } from 'bullmq';
+import { CalendarService } from '../calendar/calendar.service.js';
+import { jobId, JOBS, QUEUES } from '../jobs/queues.js';
+import { MetalPricesService } from './metal-prices.service.js';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -131,7 +137,58 @@ const listOf = <T extends z.ZodType>(schema: T) => z.array(schema).min(1).max(50
 @ApiTags('Admin')
 @Controller({ path: 'admin/content', version: '1' })
 export class ContentAdminController {
-  constructor(private readonly content: ContentService) {}
+  constructor(
+    private readonly content: ContentService,
+    private readonly calendar: CalendarService,
+    private readonly metals: MetalPricesService,
+    @InjectQueue(QUEUES.maintenance) private readonly maintenance: Queue,
+  ) {}
+
+  @Roles('admin', 'moderator')
+  @Get('calendar-status')
+  @ApiOperation({ summary: 'Hijri month starts, their source, verification and conflicts' })
+  calendarStatus() {
+    return this.calendar.status();
+  }
+
+  @Roles('admin')
+  @Post('religious-days/sync')
+  @HttpCode(202)
+  @ApiOperation({ summary: 'Regenerate holy days now (normally daily)' })
+  async syncDays() {
+    await this.maintenance.add(
+      JOBS.syncReligiousDays,
+      {},
+      { jobId: jobId('days', 'manual', Date.now()) },
+    );
+    return { queued: true };
+  }
+
+  @Roles('admin')
+  @Delete('religious-days/:key/:hijriYear/override')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Remove an admin override; the generated date applies again' })
+  async revert(
+    @Param('key') key: string,
+    @Param('hijriYear', ParseIntPipe) hijriYear: number,
+  ): Promise<void> {
+    await this.calendar.revertToAuto(key, hijriYear);
+  }
+
+  @Roles('admin')
+  @Get('zakat-rates')
+  zakatAdmin() {
+    return this.content.zakatAdminView();
+  }
+
+  @Roles('admin')
+  @Post('zakat-rates/auto')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Stop using a pinned price and refresh from market data now' })
+  async resumeAuto() {
+    await this.metals.resumeAuto();
+    return this.metals.refresh();
+  }
 
   @Roles('admin')
   @Put('dua-categories')
@@ -184,6 +241,7 @@ export class ContentAdminController {
 
   @Roles('admin')
   @Put('zakat-rates')
+  @ApiOperation({ summary: 'Pin prices manually; automatic updates pause until resumed' })
   zakat(@CurrentUser() user: AuthUser, @Body() body: ZakatRatesDto) {
     return this.content.setZakatRates(user.id, body);
   }

@@ -36,6 +36,7 @@ export const esmaSchema = z.object({
 export const religiousDaySchema = z.object({
   date: isoDate,
   key: slug,
+  hijriYear: z.number().int().min(1400).max(1700),
   nameTr: z.string().min(1).max(80),
   nameEn: z.string().max(80).optional(),
   hijri: z.string().max(60).optional(),

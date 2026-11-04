@@ -22,6 +22,8 @@ export const JOBS = {
   checkPushReceipts: 'check-push-receipts',
   broadcast: 'broadcast',
   pruneSyncBatches: 'prune-sync-batches',
+  syncReligiousDays: 'sync-religious-days',
+  refreshMetalPrices: 'refresh-metal-prices',
 } as const;
 
 /** Deterministic job id for de-duplication. BullMQ forbids ':' in custom ids. */

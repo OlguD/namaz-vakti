@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { and, asc, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, lte, sql } from 'drizzle-orm';
 import { AppError } from '../common/errors.js';
 import { type Database, InjectDb } from '../db/database.module.js';
-import { duaCategories, duas, esma, religiousDays, zakatSettings } from '../db/schema/index.js';
+import {
+  duaCategories,
+  duas,
+  esma,
+  metalPriceHistory,
+  religiousDays,
+  zakatSettings,
+} from '../db/schema/index.js';
 import { addDays, localDate } from '../prayer-times/time-utils.js';
 import {
   type DuaCategoryInput,
@@ -50,7 +57,17 @@ export class ContentService {
     const start = from ?? addDays(today, -1);
     const end = to ?? addDays(start, 400);
     return this.db
-      .select()
+      .select({
+        id: religiousDays.id,
+        date: religiousDays.date,
+        key: religiousDays.key,
+        hijriYear: religiousDays.hijriYear,
+        nameTr: religiousDays.nameTr,
+        nameEn: religiousDays.nameEn,
+        hijri: religiousDays.hijri,
+        note: religiousDays.note,
+        source: religiousDays.source,
+      })
       .from(religiousDays)
       .where(and(gte(religiousDays.date, start), lte(religiousDays.date, end)))
       .orderBy(asc(religiousDays.date));
@@ -68,8 +85,29 @@ export class ContentService {
       silverNisabGrams: Number(row?.silverNisabGrams ?? 561),
       /** Nisab in currency, by the gold standard; null until a price is set. */
       nisabAmount: gold === null ? null : Math.round(gold * goldNisab * 100) / 100,
+      usdTry: row?.usdTry ? Number(row.usdTry) : null,
+      /** `auto` = market data (TCMB + goldapi.io); `manual` = set by an admin. */
+      source: row?.source ?? 'auto',
+      fetchedAt: row?.fetchedAt?.toISOString() ?? null,
+      /** Automatic prices older than three days: the app shows "may be out of date". */
+      stale:
+        row?.source === 'manual'
+          ? false
+          : !row?.fetchedAt || Date.now() - row.fetchedAt.getTime() > 3 * 86_400_000,
+      sources: row?.source === 'manual' ? [] : ['TCMB', 'GoldAPI.io'],
       updatedAt: row?.updatedAt.toISOString() ?? null,
     };
+  }
+
+  /** Admin view: public fields plus the last error and recent accepted snapshots. */
+  async zakatAdminView() {
+    const [row] = await this.db.select().from(zakatSettings).where(eq(zakatSettings.id, 1));
+    const history = await this.db
+      .select()
+      .from(metalPriceHistory)
+      .orderBy(desc(metalPriceHistory.fetchedAt))
+      .limit(30);
+    return { ...(await this.zakatRates()), lastError: row?.lastError ?? null, history };
   }
 
   // ---- admin -------------------------------------------------------------
@@ -155,21 +193,29 @@ export class ContentService {
     return items.length;
   }
 
+  /**
+   * Admin overrides / one-off additions. Stored as `manual`, which the automatic
+   * generator never overwrites; an override replaces the auto row with the same
+   * key and hijri year.
+   */
   async upsertReligiousDays(input: ReligiousDayInput[]): Promise<number> {
-    const days = lastBy(input, (day) => `${day.date}|${day.key}`);
+    const days = lastBy(input, (day) => `${day.key}|${day.hijriYear}`);
     if (days.length === 0) {
       return 0;
     }
     await this.db
       .insert(religiousDays)
-      .values(days)
+      .values(days.map((day) => ({ ...day, source: 'manual' as const })))
       .onConflictDoUpdate({
-        target: [religiousDays.date, religiousDays.key],
+        target: [religiousDays.key, religiousDays.hijriYear],
         set: {
+          date: sql`excluded.date`,
           nameTr: sql`excluded.name_tr`,
           nameEn: sql`excluded.name_en`,
           hijri: sql`excluded.hijri`,
           note: sql`excluded.note`,
+          source: sql`'manual'`,
+          updatedAt: sql`now()`,
         },
       });
     return days.length;
@@ -207,6 +253,8 @@ export class ContentService {
       ...(input.silverNisabGrams !== undefined
         ? { silverNisabGrams: input.silverNisabGrams.toFixed(2) }
         : {}),
+      // Pinning a price stops automatic updates until an admin resumes them.
+      source: 'manual' as const,
       updatedBy: adminId,
       updatedAt: new Date(),
     };
