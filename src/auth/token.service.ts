@@ -8,6 +8,7 @@ import { refreshTokens } from '../db/schema/index.js';
 import { AppError } from '../common/errors.js';
 import { HttpStatus } from '@nestjs/common';
 import type { AuthUser } from './auth.decorators.js';
+import { AccessRevocation } from './access-revocation.service.js';
 
 export interface TokenPair {
   accessToken: string;
@@ -21,6 +22,8 @@ interface AccessClaims {
   kind: AuthUser['kind'];
   role: AuthUser['role'];
   ev: boolean;
+  /** Issued-at in milliseconds; finer than `iat`, used for revocation checks. */
+  iam: number;
 }
 
 export function sha256(value: string): string {
@@ -38,19 +41,24 @@ export class TokenService {
     private readonly jwt: JwtService,
     private readonly config: AppConfig,
     @InjectDb() private readonly db: Database,
+    private readonly revocation: AccessRevocation,
   ) {}
 
   async verifyAccessToken(token: string): Promise<AuthUser> {
+    let claims: AccessClaims;
     try {
-      const claims = await this.jwt.verifyAsync<AccessClaims>(token, {
+      claims = await this.jwt.verifyAsync<AccessClaims>(token, {
         algorithms: ['HS256'],
         audience: 'namaz-vakti-app',
         issuer: 'namaz-vakti-api',
       });
-      return { id: claims.sub, kind: claims.kind, role: claims.role, emailVerified: claims.ev };
     } catch {
       throw AppError.unauthenticated('Access token is invalid or expired');
     }
+    if (await this.revocation.isRevoked(claims.sub, claims.iam)) {
+      throw AppError.unauthenticated('Session has ended; sign in again');
+    }
+    return { id: claims.sub, kind: claims.kind, role: claims.role, emailVerified: claims.ev };
   }
 
   /** Issues an access token and starts a new refresh-token family (a new login). */
@@ -131,7 +139,9 @@ export class TokenService {
       .where(and(eq(refreshTokens.familyId, row.familyId), isNull(refreshTokens.revokedAt)));
   }
 
+  /** Signs the user out everywhere: refresh tokens revoked, live access tokens voided. */
   async revokeAllForUser(userId: string, tx: Database | Tx = this.db): Promise<void> {
+    await this.revocation.revokeUser(userId);
     await tx
       .update(refreshTokens)
       .set({ revokedAt: new Date() })
@@ -150,6 +160,7 @@ export class TokenService {
       kind: user.kind,
       role: user.role,
       ev: user.emailVerified,
+      iam: Date.now(),
     };
     const accessToken = await this.jwt.signAsync(claims, {
       algorithm: 'HS256',

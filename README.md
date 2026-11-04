@@ -39,6 +39,9 @@ Aynı imaj üç rolde çalışır: `api` (HTTP + WebSocket), `worker` (kuyruk t�
 | `live` | Seçili YouTube kanallarından canlı/yaklaşan yayın tespiti |
 | `chat` | Socket.IO `/chat` namespace'i, odalar, geçmiş, bildir/engelle, filtre, yavaş mod |
 | `notifications` | Cihaz kaydı, Expo push yayınları, ölü token temizliği |
+| `worship` | Namaz takibi, kaza sayaçları ve hesaplayıcı, zikirmatik senkronu ve istatistikler, İbadet özeti, seri |
+| `quran` | Kişisel hatim ilerlemesi, ortak hatim (davet kodu, cüz alma/okundu, turlar) |
+| `content` | Dualar, Esmaü'l-Hüsna, dini günler, zekât fiyatları; kullanıcı ayarları senkronu |
 | `admin` | Rapor kuyruğu, ban/mute, rol, kanal yönetimi, cami önerisi onayı, duyuru |
 | `worker` | Kuyruk işleyicileri ve zamanlanmış işler |
 
@@ -51,6 +54,7 @@ cp .env.example .env                    # JWT_ACCESS_SECRET'ı değiştir
 docker compose up -d postgres redis     # PostGIS + Redis
 npm ci
 npm run db:migrate:dev                  # şemayı kur
+npm run content:import:dev              # dualar, esma (ve varsa dini günler)
 npm run start:dev                       # API → http://localhost:3000
 npm run start:worker:dev                # ayrı terminalde worker
 ```
@@ -76,6 +80,48 @@ docker compose up -d --build    # migrate → api ×2 + worker
 ```
 
 `api` servisi Traefik label'larıyla `${API_DOMAIN}` üzerinde yayınlanır. Sağlık kontrolleri `/health/live` (süreç ayakta mı) ve `/health/ready` (DB + Redis cevap veriyor mu) uçlarındadır.
+
+---
+
+## Web istemcisi (tarayıcı)
+
+Aynı API hem mobil uygulamaya hem tarayıcıdaki web uygulamasına hizmet verir. Tek fark refresh token'ın nerede durduğudur:
+
+| | Mobil | Web |
+|---|---|---|
+| Access token | Gövdede, Keychain/Keystore'da | Gövdede, **yalnızca bellekte** |
+| Refresh token | Gövdede, Keychain/Keystore'da | `nv_rt` çerezinde: `HttpOnly; Secure; SameSite=Strict; Path=/v1/auth`. Gövdede `null` döner |
+| İstek başlığı | — | `X-Client-Platform: web` + `credentials: 'include'` |
+
+- **CSRF koruması:** Çerez yalnızca `CORS_ORIGINS` içindeki bir Origin'den ve `X-Client-Platform: web` başlığıyla kabul edilir. Başlık preflight'ı zorunlu kılar; SameSite de ayrıca korur.
+- **Sayfa yenilenince:** Web uygulaması açılışta `POST /v1/auth/refresh` çağırır (gövde boş). Çerez geçerliyse yeni access token alır; değilse çerez silinir.
+- **Socket.IO:** Tarayıcı bağlantıları da yalnızca izinli origin'lerden kabul edilir.
+- **Web push yok:** Expo push tarayıcıyı desteklemiyor. Web'de vakit hatırlatmaları sekme açıkken tarayıcı Notification API'siyle yapılır.
+
+API ile web uygulaması aynı ana alan adındaysa (`app.example.com` + `api.example.com`) `WEB_COOKIE_SAMESITE=strict` kalmalı. Tamamen farklı alan adlarında `none` gerekir, ama bu daha zayıf bir koruma demektir; mümkünse aynı alan adını kullan.
+
+**Oturum iptali:** Hesap silme, ban, rol değişikliği, şifre sıfırlama ve anonim hesabın birleştirilmesi, o kullanıcının **o ana kadar verilmiş access token'larını da anında** geçersiz kılar (Redis'te kısa ömürlü işaret), 15 dakikalık sürelerinin dolması beklenmez.
+
+## İbadet senkronu
+
+Veriler hesaba bağlıdır; telefon ve web aynı veriyi görür. Anonim hesaplarda da çalışır, giriş yapılınca korunur.
+
+- **Gün bilgisi:** "Bugün" kullanıcının saat dilimine göre değiştiği için tarih (`date`/`today`) her zaman istemciden gönderilir. Sunucu yalnızca geçerli bir tarih olup olmadığını ve aralığını kontrol eder.
+- **Zikirmatik çevrimdışı çalışır.** Uygulama sayıları biriktirir ve `POST /v1/worship/dhikr-sync` ile **delta** olarak gönderir. Her yükleme bir `batchId` taşır; aynı batch tekrar gelirse uygulanmaz (`applied: false`). Bağlantı koptuğunda aynı `batchId` ile tekrar denemek güvenlidir.
+- **Kaza sayaçları** atomik olarak azalır ve sıfırın altına inmez; iki cihaz aynı anda dokunsa da sayı bozulmaz.
+- **Seri ("7 gündür"):** Vaktinde kılınan bir namaz, zikir ya da Kur'an okuma olan ardışık günlerdir. Bugün henüz bir şey yapılmadıysa dünkü seri bozulmuş sayılmaz.
+- **Ortak hatim:** Aynı cüze aynı anda dokunan iki kişiden yalnızca biri alır, diğeri `409` görür. Üye olmayan biri grubu `404` olarak görür; grup kimlikleri dışarıdan yoklanamaz. Davet kodu döndürülebilir. Sahip ayrılırsa en eski üye sahip olur, son üye ayrılınca grup silinir.
+- **Ayarlar** tek bir sürümlü belgedir (`GET/PUT /v1/me/settings`). İki cihaz aynı anda değiştirirse ikincisi `409` ve güncel belgeyi alır, birleştirip tekrar gönderir. Tanınmayan alanlar reddedilir.
+
+## İçerik (dualar, Esmaü'l-Hüsna, dini günler)
+
+İçerik `content/` klasöründeki JSON dosyalarından yüklenir: `npm run content:import`. Docker'da `migrate` servisi bunu otomatik yapar. Yükleme idempotenttir, tekrar çalıştırmak güvenlidir. Admin uçları (`/v1/admin/content/*`) ile mağaza güncellemesi olmadan düzenlenebilir.
+
+> ⚠️ **Yayından önce:** `duas.json` ve `esma.json` ilk taslaktır (Arapça metinler ve isimler tasarımdan; anlamlar ve kaynaklar taslak). Dini metinlerin ehil biri tarafından kontrol edilmesi şart.
+>
+> **Dini günler** otomatik doldurulmaz. `religious-days.example.json` içindeki tarihler tasarımdan alınmış örneklerdir. Diyanet'in yayımladığı yıllık listeden `religious-days.json` dosyasını oluşturup içe aktar ya da `POST /v1/admin/content/religious-days` ile yükle.
+
+**Zekât:** Gram altın ve gümüş fiyatını admin `PUT /v1/admin/content/zakat-rates` ile girer; nisap varsayılanı 80,18 g altındır. Otomatik fiyat beslemesi yok. İstersen lisanslı bir fiyat API'si eklenebilir.
 
 ---
 
@@ -150,6 +196,7 @@ Uygulama `code` alanına göre davranmalı, `message` değişebilir. Kodların t
 | `daily-prayer-refresh` | Her gün 01:23 | Aktif ilçelerin tablolarını uzatır, eski günleri siler |
 | `live-poll` | `LIVE_POLL_CRON` (2 dk) | Kanalların canlı durumunu günceller |
 | `push-receipts` | 15 dk'da bir | Silinen uygulamaların push token'larını temizler |
+| `prune-sync-batches` | Her gün 03:37 | 30 günden eski zikir senkron anahtarlarını siler |
 
 ## Kotalar ve dış servisler
 

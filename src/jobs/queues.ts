@@ -6,6 +6,7 @@ export const QUEUES = {
   mosques: 'mosques',
   live: 'live',
   notifications: 'notifications',
+  maintenance: 'maintenance',
 } as const;
 
 export const JOBS = {
@@ -20,6 +21,7 @@ export const JOBS = {
   sendPushBatch: 'send-push-batch',
   checkPushReceipts: 'check-push-receipts',
   broadcast: 'broadcast',
+  pruneSyncBatches: 'prune-sync-batches',
 } as const;
 
 /** Deterministic job id for de-duplication. BullMQ forbids ':' in custom ids. */

@@ -3,12 +3,16 @@ import { ApiBearerAuth, ApiNoContentResponse, ApiOperation, ApiTags } from '@nes
 import { type AuthUser, CurrentUser } from '../auth/auth.decorators.js';
 import { UpdateMeDto } from './dto.js';
 import { UsersService } from './users.service.js';
+import { AccessRevocation } from '../auth/access-revocation.service.js';
 
 @ApiTags('Me')
 @ApiBearerAuth()
 @Controller({ path: 'me', version: '1' })
 export class UsersController {
-  constructor(private readonly users: UsersService) {}
+  constructor(
+    private readonly users: UsersService,
+    private readonly revocation: AccessRevocation,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Current account profile' })
@@ -31,5 +35,7 @@ export class UsersController {
   @ApiNoContentResponse()
   async remove(@CurrentUser() user: AuthUser): Promise<void> {
     await this.users.deleteAccount(user.id);
+    // Tokens already handed out must stop working now, not when they expire.
+    await this.revocation.revokeUser(user.id);
   }
 }

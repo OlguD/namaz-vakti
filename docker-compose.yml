@@ -59,7 +59,8 @@ services:
 
   migrate:
     <<: *app
-    command: ["node", "dist/db/migrate.js"]
+    # Schema first, then editorial content (duas, esma, holy days) from ./content.
+    command: ["sh", "-c", "node dist/db/migrate.js && node dist/content/import.js"]
     restart: "no"
 
   api:

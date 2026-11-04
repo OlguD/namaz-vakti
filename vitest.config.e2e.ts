@@ -23,6 +23,7 @@ export default defineConfig({
       SWAGGER_ENABLED: 'false',
       WORKER_SCHEDULES_ENABLED: 'false',
       RATE_LIMITS_ENABLED: 'false',
+      CORS_ORIGINS: 'https://app.example.com',
     },
     hookTimeout: 60_000,
   },

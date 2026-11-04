@@ -20,7 +20,15 @@ export const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   PUBLIC_BASE_URL: z.url().default('http://localhost:3000'),
+  /** Browser origins allowed to call the API (web app). Also the CSRF allowlist for cookie auth. */
   CORS_ORIGINS: csv,
+  /** Web clients keep the refresh token in an httpOnly cookie with these attributes. */
+  WEB_COOKIE_SAMESITE: z.enum(['strict', 'lax', 'none']).default('strict'),
+  WEB_COOKIE_DOMAIN: z.string().optional(),
+  WEB_COOKIE_SECURE: z
+    .enum(['true', 'false', '1', '0'])
+    .default('true')
+    .transform((value) => value === 'true' || value === '1'),
   SWAGGER_ENABLED: bool,
   TRUST_PROXY: bool,
   /** Only for automated tests; never disable in production. */

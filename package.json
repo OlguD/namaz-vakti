@@ -22,6 +22,8 @@
     "db:migrate": "node --env-file-if-exists=.env dist/db/migrate.js",
     "db:migrate:dev": "tsx --env-file-if-exists=.env src/db/migrate.ts",
     "db:studio": "drizzle-kit studio",
+    "content:import": "node --env-file-if-exists=.env dist/content/import.js",
+    "content:import:dev": "tsx --env-file-if-exists=.env src/content/import.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",

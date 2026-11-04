@@ -19,6 +19,7 @@ export class SchedulesService implements OnApplicationBootstrap {
     @InjectQueue(QUEUES.prayerTimes) private readonly prayerTimes: Queue,
     @InjectQueue(QUEUES.live) private readonly live: Queue,
     @InjectQueue(QUEUES.notifications) private readonly notifications: Queue,
+    @InjectQueue(QUEUES.maintenance) private readonly maintenance: Queue,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -59,6 +60,12 @@ export class SchedulesService implements OnApplicationBootstrap {
         },
       ),
       // Every 15 minutes — Expo delivery receipts (removes uninstalled devices).
+      // Daily 03:37 — forget dhikr-sync idempotency keys older than 30 days.
+      this.maintenance.upsertJobScheduler(
+        'prune-sync-batches',
+        { pattern: '37 3 * * *' },
+        { name: JOBS.pruneSyncBatches },
+      ),
       this.notifications.upsertJobScheduler(
         'push-receipts',
         { pattern: '*/15 * * * *' },

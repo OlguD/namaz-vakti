@@ -1,0 +1,136 @@
+{
+  "reviewed": false,
+  "note": "Starter set. Arabic, transliteration, meaning and source must be checked by a qualified person before publishing.",
+  "categories": [
+    { "id": "sabah-aksam", "nameTr": "Sabah-Akşam", "nameEn": "Morning & evening", "icon": "sunrise", "sortOrder": 1 },
+    { "id": "namaz", "nameTr": "Namaz", "nameEn": "Prayer", "icon": "mihrab", "sortOrder": 2 },
+    { "id": "yemek", "nameTr": "Yemek", "nameEn": "Meals", "icon": "utensils", "sortOrder": 3 },
+    { "id": "yolculuk", "nameTr": "Yolculuk", "nameEn": "Travel", "icon": "route", "sortOrder": 4 },
+    { "id": "hastalik", "nameTr": "Hastalık", "nameEn": "Illness", "icon": "heart", "sortOrder": 5 },
+    { "id": "sikinti", "nameTr": "Sıkıntı anı", "nameEn": "Hardship", "icon": "lamp", "sortOrder": 6 },
+    { "id": "uyku", "nameTr": "Uyku", "nameEn": "Sleep", "icon": "moon", "sortOrder": 7 },
+    { "id": "kuran", "nameTr": "Kur’an’dan", "nameEn": "From the Qur’an", "icon": "book", "sortOrder": 8 }
+  ],
+  "duas": [
+    {
+      "key": "sabah-asbahna",
+      "categoryId": "sabah-aksam",
+      "title": "Sabah duası",
+      "arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلّٰهِ وَالْحَمْدُ لِلّٰهِ",
+      "transliteration": "Asbahnâ ve asbaha’l-mülkü lillâh, ve’l-hamdü lillâh.",
+      "meaningTr": "Sabaha erdik, mülk de Allah’ın olarak sabaha erdi. Hamd Allah’a mahsustur.",
+      "source": "Müslim",
+      "sortOrder": 1
+    },
+    {
+      "key": "aksam-emseyna",
+      "categoryId": "sabah-aksam",
+      "title": "Akşam duası",
+      "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلّٰهِ وَالْحَمْدُ لِلّٰهِ",
+      "transliteration": "Emseynâ ve emse’l-mülkü lillâh, ve’l-hamdü lillâh.",
+      "meaningTr": "Akşama erdik, mülk de Allah’ın olarak akşama erdi. Hamd Allah’a mahsustur.",
+      "source": "Müslim",
+      "sortOrder": 2
+    },
+    {
+      "key": "namaz-sonrasi-selam",
+      "categoryId": "namaz",
+      "title": "Namazdan sonra",
+      "arabic": "اَللّٰهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "transliteration": "Allâhümme ente’s-selâm ve minke’s-selâm, tebârekte yâ ze’l-celâli ve’l-ikrâm.",
+      "meaningTr": "Allah’ım! Sen Selâm’sın, esenlik sendendir. Ey celal ve ikram sahibi, Sen ne yücesin.",
+      "source": "Müslim",
+      "sortOrder": 1
+    },
+    {
+      "key": "yemek-once",
+      "categoryId": "yemek",
+      "title": "Yemekten önce",
+      "arabic": "بِسْمِ اللّٰهِ",
+      "transliteration": "Bismillâh.",
+      "meaningTr": "Allah’ın adıyla.",
+      "source": "Ebû Dâvûd",
+      "sortOrder": 1
+    },
+    {
+      "key": "yemek-sonra",
+      "categoryId": "yemek",
+      "title": "Yemekten sonra",
+      "arabic": "اَلْحَمْدُ لِلّٰهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+      "transliteration": "Elhamdü lillâhillezî et’amenâ ve sekânâ ve cealenâ müslimîn.",
+      "meaningTr": "Bizi yediren, içiren ve Müslüman kılan Allah’a hamdolsun.",
+      "source": "Ebû Dâvûd, Tirmizî",
+      "sortOrder": 2
+    },
+    {
+      "key": "yolculuk-binek",
+      "categoryId": "yolculuk",
+      "title": "Yolculuğa çıkarken",
+      "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلٰى رَبِّنَا لَمُنْقَلِبُونَ",
+      "transliteration": "Sübhânellezî sehhara lenâ hâzâ ve mâ künnâ lehû mukrinîn, ve innâ ilâ rabbinâ le-munkalibûn.",
+      "meaningTr": "Bunu bizim hizmetimize veren Allah’ı tenzih ederiz; yoksa biz buna güç yetiremezdik. Şüphesiz biz Rabbimize döneceğiz.",
+      "source": "Zuhruf 13-14",
+      "sortOrder": 1
+    },
+    {
+      "key": "hastalik-sifa",
+      "categoryId": "hastalik",
+      "title": "Hasta için şifa duası",
+      "arabic": "أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا",
+      "transliteration": "Ezhibi’l-be’se rabbe’n-nâs, işfi ente’ş-şâfî, lâ şifâe illâ şifâük, şifâen lâ yugâdiru sekamâ.",
+      "meaningTr": "Ey insanların Rabbi! Sıkıntıyı gider, şifa ver; şifa veren Sensin. Senin şifandan başka şifa yoktur. Hiçbir hastalık bırakmayan bir şifa ver.",
+      "source": "Buhârî",
+      "sortOrder": 1
+    },
+    {
+      "key": "sikinti-yunus",
+      "categoryId": "sikinti",
+      "title": "Hz. Yûnus’un duası",
+      "arabic": "لَا إِلٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+      "transliteration": "Lâ ilâhe illâ ente sübhâneke innî küntü mine’z-zâlimîn.",
+      "meaningTr": "Senden başka ilah yoktur. Sen eksikliklerden münezzehsin. Ben gerçekten kendine zulmedenlerden oldum.",
+      "source": "Enbiyâ 87",
+      "sortOrder": 1
+    },
+    {
+      "key": "sikinti-hasbunallah",
+      "categoryId": "sikinti",
+      "title": "Tevekkül",
+      "arabic": "حَسْبُنَا اللّٰهُ وَنِعْمَ الْوَكِيلُ",
+      "transliteration": "Hasbünallâhu ve ni’me’l-vekîl.",
+      "meaningTr": "Allah bize yeter; O ne güzel vekildir.",
+      "source": "Âl-i İmrân 173",
+      "sortOrder": 2
+    },
+    {
+      "key": "uyku-bismike",
+      "categoryId": "uyku",
+      "title": "Uyumadan önce",
+      "arabic": "بِاسْمِكَ اللّٰهُمَّ أَمُوتُ وَأَحْيَا",
+      "transliteration": "Bismike’llâhümme emûtü ve ahyâ.",
+      "meaningTr": "Allah’ım! Senin adınla ölür ve dirilirim.",
+      "source": "Buhârî",
+      "sortOrder": 1
+    },
+    {
+      "key": "kuran-rabbena-atina",
+      "categoryId": "kuran",
+      "title": "Rabbenâ âtinâ",
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbenâ âtinâ fi’d-dünyâ haseneten ve fi’l-âhirati haseneten ve kınâ azâbe’n-nâr.",
+      "meaningTr": "Rabbimiz! Bize dünyada da iyilik ver, ahirette de iyilik ver ve bizi ateş azabından koru.",
+      "source": "Bakara 201",
+      "sortOrder": 1
+    },
+    {
+      "key": "kuran-zidni-ilma",
+      "categoryId": "kuran",
+      "title": "İlim duası",
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidnî ilmâ.",
+      "meaningTr": "Rabbim! İlmimi artır.",
+      "source": "Tâhâ 114",
+      "sortOrder": 2
+    }
+  ]
+}

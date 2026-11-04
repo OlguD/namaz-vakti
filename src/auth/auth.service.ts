@@ -316,6 +316,7 @@ export class AuthService {
     }
     await tx.update(devices).set({ userId: targetId }).where(eq(devices.userId, caller.id));
     await tx.delete(users).where(and(eq(users.id, caller.id), eq(users.kind, 'anonymous')));
+    await this.tokens.revokeAllForUser(caller.id, tx);
   }
 
   private async availableName(

@@ -18,6 +18,8 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { PrayerTimesModule } from './prayer-times/prayer-times.module.js';
 import { REDIS } from './redis/redis.module.js';
 import { UsersModule } from './users/users.module.js';
+import { WorshipModule } from './worship/worship.module.js';
+import { ContentModule } from './content/content.module.js';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { UsersModule } from './users/users.module.js';
     LiveModule,
     NotificationsModule,
     ChatModule,
+    WorshipModule,
+    ContentModule,
     AdminModule,
   ],
   controllers: [HealthController],

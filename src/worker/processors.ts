@@ -9,6 +9,7 @@ import { LocationsService } from '../locations/locations.service.js';
 import { MosquesService } from '../mosques/mosques.service.js';
 import { type BroadcastJob, NotificationsService } from '../notifications/notifications.service.js';
 import { PrayerTimesService } from '../prayer-times/prayer-times.service.js';
+import { WorshipService } from '../worship/worship.service.js';
 
 /** Pause between upstream calls during full syncs, to stay polite to free services. */
 const SYNC_DELAY_MS = 400;
@@ -166,6 +167,22 @@ export class NotificationsProcessor extends WorkerHost {
         return null;
       case JOBS.checkPushReceipts:
         return { removedTokens: await this.notifications.checkReceipts() };
+      default:
+        throw new Error(`Unknown job ${job.name}`);
+    }
+  }
+}
+
+@Processor(QUEUES.maintenance, { concurrency: 1 })
+export class MaintenanceProcessor extends WorkerHost {
+  constructor(private readonly worship: WorshipService) {
+    super();
+  }
+
+  async process(job: Job): Promise<unknown> {
+    switch (job.name) {
+      case JOBS.pruneSyncBatches:
+        return { pruned: await this.worship.pruneSyncBatches() };
       default:
         throw new Error(`Unknown job ${job.name}`);
     }

@@ -8,6 +8,8 @@ import { AuthGuard } from './auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { SocialVerifier } from './social-verifier.service.js';
 import { TokenService } from './token.service.js';
+import { WebSession, WebTokenInterceptor } from './web-session.js';
+import { AccessRevocation } from './access-revocation.service.js';
 
 @Global()
 @Module({
@@ -19,7 +21,16 @@ import { TokenService } from './token.service.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService, SocialVerifier, MailService, AuthGuard],
-  exports: [TokenService, AuthGuard, MailService],
+  providers: [
+    AuthService,
+    TokenService,
+    SocialVerifier,
+    MailService,
+    AuthGuard,
+    WebSession,
+    WebTokenInterceptor,
+    AccessRevocation,
+  ],
+  exports: [TokenService, AuthGuard, MailService, AccessRevocation],
 })
 export class AuthModule {}

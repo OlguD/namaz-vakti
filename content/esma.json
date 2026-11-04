@@ -1,0 +1,600 @@
+{
+  "reviewed": false,
+  "note": "Arabic and transliteration taken from the app design; Turkish meanings are a first draft. Have a qualified person review before publishing.",
+  "names": [
+    {
+      "no": 1,
+      "arabic": "الله",
+      "transliteration": "Allah",
+      "meaningTr": "Bütün isim ve sıfatları kendisinde toplayan, ibadete layık tek ilah."
+    },
+    {
+      "no": 2,
+      "arabic": "الرحمن",
+      "transliteration": "er-Rahmân",
+      "meaningTr": "Dünyada bütün yaratılmışlara merhamet eden."
+    },
+    {
+      "no": 3,
+      "arabic": "الرحيم",
+      "transliteration": "er-Rahîm",
+      "meaningTr": "Ahirette müminlere özel olarak merhamet eden."
+    },
+    {
+      "no": 4,
+      "arabic": "الملك",
+      "transliteration": "el-Melik",
+      "meaningTr": "Mülkün ve kâinatın gerçek sahibi, mutlak hükümdar."
+    },
+    {
+      "no": 5,
+      "arabic": "القدوس",
+      "transliteration": "el-Kuddûs",
+      "meaningTr": "Her türlü eksiklikten uzak, tertemiz olan."
+    },
+    {
+      "no": 6,
+      "arabic": "السلام",
+      "transliteration": "es-Selâm",
+      "meaningTr": "Kullarını selamete çıkaran, esenlik veren."
+    },
+    {
+      "no": 7,
+      "arabic": "المؤمن",
+      "transliteration": "el-Mü’min",
+      "meaningTr": "Güven veren, emin kılan; vaadine sadık olan."
+    },
+    {
+      "no": 8,
+      "arabic": "المهيمن",
+      "transliteration": "el-Müheymin",
+      "meaningTr": "Her şeyi gözetip koruyan."
+    },
+    {
+      "no": 9,
+      "arabic": "العزيز",
+      "transliteration": "el-Azîz",
+      "meaningTr": "İzzet sahibi, mağlup edilemeyen."
+    },
+    {
+      "no": 10,
+      "arabic": "الجبار",
+      "transliteration": "el-Cebbâr",
+      "meaningTr": "Dilediğini yaptırmaya gücü yeten."
+    },
+    {
+      "no": 11,
+      "arabic": "المتكبر",
+      "transliteration": "el-Mütekebbir",
+      "meaningTr": "Büyüklükte eşi olmayan."
+    },
+    {
+      "no": 12,
+      "arabic": "الخالق",
+      "transliteration": "el-Hâlık",
+      "meaningTr": "Yoktan var eden, yaratan."
+    },
+    {
+      "no": 13,
+      "arabic": "البارئ",
+      "transliteration": "el-Bâri’",
+      "meaningTr": "Her şeyi bir ahenk içinde yaratan."
+    },
+    {
+      "no": 14,
+      "arabic": "المصور",
+      "transliteration": "el-Musavvir",
+      "meaningTr": "Varlıklara şekil ve suret veren."
+    },
+    {
+      "no": 15,
+      "arabic": "الغفار",
+      "transliteration": "el-Gaffâr",
+      "meaningTr": "Günahları çokça bağışlayan."
+    },
+    {
+      "no": 16,
+      "arabic": "القهار",
+      "transliteration": "el-Kahhâr",
+      "meaningTr": "Her şeye galip gelen."
+    },
+    {
+      "no": 17,
+      "arabic": "الوهاب",
+      "transliteration": "el-Vehhâb",
+      "meaningTr": "Karşılıksız bolca veren."
+    },
+    {
+      "no": 18,
+      "arabic": "الرزاق",
+      "transliteration": "er-Rezzâk",
+      "meaningTr": "Bütün canlıların rızkını veren."
+    },
+    {
+      "no": 19,
+      "arabic": "الفتاح",
+      "transliteration": "el-Fettâh",
+      "meaningTr": "Her türlü darlıktan kurtaran, kapıları açan."
+    },
+    {
+      "no": 20,
+      "arabic": "العليم",
+      "transliteration": "el-Alîm",
+      "meaningTr": "Her şeyi en ince ayrıntısıyla bilen."
+    },
+    {
+      "no": 21,
+      "arabic": "القابض",
+      "transliteration": "el-Kâbız",
+      "meaningTr": "Dilediğine rızkı daraltan."
+    },
+    {
+      "no": 22,
+      "arabic": "الباسط",
+      "transliteration": "el-Bâsıt",
+      "meaningTr": "Dilediğine rızkı genişleten."
+    },
+    {
+      "no": 23,
+      "arabic": "الخافض",
+      "transliteration": "el-Hâfıd",
+      "meaningTr": "Dilediğini alçaltan."
+    },
+    {
+      "no": 24,
+      "arabic": "الرافع",
+      "transliteration": "er-Râfi’",
+      "meaningTr": "Dilediğini yükselten."
+    },
+    {
+      "no": 25,
+      "arabic": "المعز",
+      "transliteration": "el-Muizz",
+      "meaningTr": "Dilediğine izzet veren."
+    },
+    {
+      "no": 26,
+      "arabic": "المذل",
+      "transliteration": "el-Müzill",
+      "meaningTr": "Dilediğini zillete düşüren."
+    },
+    {
+      "no": 27,
+      "arabic": "السميع",
+      "transliteration": "es-Semî’",
+      "meaningTr": "Her şeyi işiten."
+    },
+    {
+      "no": 28,
+      "arabic": "البصير",
+      "transliteration": "el-Basîr",
+      "meaningTr": "Her şeyi gören."
+    },
+    {
+      "no": 29,
+      "arabic": "الحكم",
+      "transliteration": "el-Hakem",
+      "meaningTr": "Mutlak hakim, hükmeden."
+    },
+    {
+      "no": 30,
+      "arabic": "العدل",
+      "transliteration": "el-Adl",
+      "meaningTr": "Mutlak adalet sahibi."
+    },
+    {
+      "no": 31,
+      "arabic": "اللطيف",
+      "transliteration": "el-Latîf",
+      "meaningTr": "Lütfu bol, en ince işleri bilen."
+    },
+    {
+      "no": 32,
+      "arabic": "الخبير",
+      "transliteration": "el-Habîr",
+      "meaningTr": "Her şeyin iç yüzünden haberdar olan."
+    },
+    {
+      "no": 33,
+      "arabic": "الحليم",
+      "transliteration": "el-Halîm",
+      "meaningTr": "Cezada acele etmeyen, yumuşak davranan."
+    },
+    {
+      "no": 34,
+      "arabic": "العظيم",
+      "transliteration": "el-Azîm",
+      "meaningTr": "Pek yüce ve büyük olan."
+    },
+    {
+      "no": 35,
+      "arabic": "الغفور",
+      "transliteration": "el-Gafûr",
+      "meaningTr": "Mağfireti bol olan, çokça bağışlayan."
+    },
+    {
+      "no": 36,
+      "arabic": "الشكور",
+      "transliteration": "eş-Şekûr",
+      "meaningTr": "Az amele çok sevap veren."
+    },
+    {
+      "no": 37,
+      "arabic": "العلي",
+      "transliteration": "el-Aliyy",
+      "meaningTr": "Yüceler yücesi."
+    },
+    {
+      "no": 38,
+      "arabic": "الكبير",
+      "transliteration": "el-Kebîr",
+      "meaningTr": "Pek büyük olan."
+    },
+    {
+      "no": 39,
+      "arabic": "الحفيظ",
+      "transliteration": "el-Hafîz",
+      "meaningTr": "Her şeyi koruyup gözeten."
+    },
+    {
+      "no": 40,
+      "arabic": "المقيت",
+      "transliteration": "el-Mukît",
+      "meaningTr": "Her canlının azığını yaratan."
+    },
+    {
+      "no": 41,
+      "arabic": "الحسيب",
+      "transliteration": "el-Hasîb",
+      "meaningTr": "Herkesin hesabını gören."
+    },
+    {
+      "no": 42,
+      "arabic": "الجليل",
+      "transliteration": "el-Celîl",
+      "meaningTr": "Celal ve azamet sahibi."
+    },
+    {
+      "no": 43,
+      "arabic": "الكريم",
+      "transliteration": "el-Kerîm",
+      "meaningTr": "Keremi ve ikramı bol olan."
+    },
+    {
+      "no": 44,
+      "arabic": "الرقيب",
+      "transliteration": "er-Rakîb",
+      "meaningTr": "Her an gözetleyen."
+    },
+    {
+      "no": 45,
+      "arabic": "المجيب",
+      "transliteration": "el-Mücîb",
+      "meaningTr": "Dualara karşılık veren."
+    },
+    {
+      "no": 46,
+      "arabic": "الواسع",
+      "transliteration": "el-Vâsi’",
+      "meaningTr": "Rahmeti ve ilmi her şeyi kuşatan."
+    },
+    {
+      "no": 47,
+      "arabic": "الحكيم",
+      "transliteration": "el-Hakîm",
+      "meaningTr": "Her işi hikmetli olan."
+    },
+    {
+      "no": 48,
+      "arabic": "الودود",
+      "transliteration": "el-Vedûd",
+      "meaningTr": "Kullarını seven ve sevilmeye layık olan."
+    },
+    {
+      "no": 49,
+      "arabic": "المجيد",
+      "transliteration": "el-Mecîd",
+      "meaningTr": "Şanı yüce olan."
+    },
+    {
+      "no": 50,
+      "arabic": "الباعث",
+      "transliteration": "el-Bâis",
+      "meaningTr": "Ölüleri dirilten."
+    },
+    {
+      "no": 51,
+      "arabic": "الشهيد",
+      "transliteration": "eş-Şehîd",
+      "meaningTr": "Her şeye şahit olan."
+    },
+    {
+      "no": 52,
+      "arabic": "الحق",
+      "transliteration": "el-Hakk",
+      "meaningTr": "Varlığı hiç değişmeden duran, hakkın ta kendisi."
+    },
+    {
+      "no": 53,
+      "arabic": "الوكيل",
+      "transliteration": "el-Vekîl",
+      "meaningTr": "Kendisine güvenilen, işleri yoluna koyan."
+    },
+    {
+      "no": 54,
+      "arabic": "القوي",
+      "transliteration": "el-Kaviyy",
+      "meaningTr": "Kuvvet sahibi."
+    },
+    {
+      "no": 55,
+      "arabic": "المتين",
+      "transliteration": "el-Metîn",
+      "meaningTr": "Sarsılmaz, pek sağlam olan."
+    },
+    {
+      "no": 56,
+      "arabic": "الولي",
+      "transliteration": "el-Veliyy",
+      "meaningTr": "İnananların dostu ve yardımcısı."
+    },
+    {
+      "no": 57,
+      "arabic": "الحميد",
+      "transliteration": "el-Hamîd",
+      "meaningTr": "Her türlü övgüye layık olan."
+    },
+    {
+      "no": 58,
+      "arabic": "المحصي",
+      "transliteration": "el-Muhsî",
+      "meaningTr": "Her şeyin sayısını bilen."
+    },
+    {
+      "no": 59,
+      "arabic": "المبدئ",
+      "transliteration": "el-Mübdi’",
+      "meaningTr": "Örneksiz yaratan."
+    },
+    {
+      "no": 60,
+      "arabic": "المعيد",
+      "transliteration": "el-Muîd",
+      "meaningTr": "Yarattıklarını yok edip yeniden dirilten."
+    },
+    {
+      "no": 61,
+      "arabic": "المحيي",
+      "transliteration": "el-Muhyî",
+      "meaningTr": "Hayat veren."
+    },
+    {
+      "no": 62,
+      "arabic": "المميت",
+      "transliteration": "el-Mümît",
+      "meaningTr": "Ölümü yaratan."
+    },
+    {
+      "no": 63,
+      "arabic": "الحي",
+      "transliteration": "el-Hayy",
+      "meaningTr": "Diri olan, ezeli ve ebedi hayat sahibi."
+    },
+    {
+      "no": 64,
+      "arabic": "القيوم",
+      "transliteration": "el-Kayyûm",
+      "meaningTr": "Kâinatı ayakta tutan, varlığı kendinden olan."
+    },
+    {
+      "no": 65,
+      "arabic": "الواجد",
+      "transliteration": "el-Vâcid",
+      "meaningTr": "Dilediğini dilediği an bulan, hiçbir şeye muhtaç olmayan."
+    },
+    {
+      "no": 66,
+      "arabic": "الماجد",
+      "transliteration": "el-Mâcid",
+      "meaningTr": "Şanı yüce, keremi bol olan."
+    },
+    {
+      "no": 67,
+      "arabic": "الواحد",
+      "transliteration": "el-Vâhid",
+      "meaningTr": "Zatında ve sıfatlarında tek olan."
+    },
+    {
+      "no": 68,
+      "arabic": "الصمد",
+      "transliteration": "es-Samed",
+      "meaningTr": "Hiçbir şeye muhtaç olmayan, her şeyin kendisine muhtaç olduğu."
+    },
+    {
+      "no": 69,
+      "arabic": "القادر",
+      "transliteration": "el-Kâdir",
+      "meaningTr": "Dilediğini dilediği gibi yapmaya gücü yeten."
+    },
+    {
+      "no": 70,
+      "arabic": "المقتدر",
+      "transliteration": "el-Muktedir",
+      "meaningTr": "Her şeye güç yetiren, kudret sahibi."
+    },
+    {
+      "no": 71,
+      "arabic": "المقدم",
+      "transliteration": "el-Mukaddim",
+      "meaningTr": "Dilediğini öne alan."
+    },
+    {
+      "no": 72,
+      "arabic": "المؤخر",
+      "transliteration": "el-Muahhir",
+      "meaningTr": "Dilediğini geri bırakan."
+    },
+    {
+      "no": 73,
+      "arabic": "الأول",
+      "transliteration": "el-Evvel",
+      "meaningTr": "Varlığının başlangıcı olmayan."
+    },
+    {
+      "no": 74,
+      "arabic": "الآخر",
+      "transliteration": "el-Âhir",
+      "meaningTr": "Varlığının sonu olmayan."
+    },
+    {
+      "no": 75,
+      "arabic": "الظاهر",
+      "transliteration": "ez-Zâhir",
+      "meaningTr": "Varlığı apaçık ortada olan."
+    },
+    {
+      "no": 76,
+      "arabic": "الباطن",
+      "transliteration": "el-Bâtın",
+      "meaningTr": "Zatının mahiyeti gizli olan."
+    },
+    {
+      "no": 77,
+      "arabic": "الوالي",
+      "transliteration": "el-Vâlî",
+      "meaningTr": "Kâinatı idare eden."
+    },
+    {
+      "no": 78,
+      "arabic": "المتعالي",
+      "transliteration": "el-Müteâlî",
+      "meaningTr": "Yaratılmışların sıfatlarından münezzeh, yüce olan."
+    },
+    {
+      "no": 79,
+      "arabic": "البر",
+      "transliteration": "el-Berr",
+      "meaningTr": "İyiliği bol olan."
+    },
+    {
+      "no": 80,
+      "arabic": "التواب",
+      "transliteration": "et-Tevvâb",
+      "meaningTr": "Tövbeleri kabul eden."
+    },
+    {
+      "no": 81,
+      "arabic": "المنتقم",
+      "transliteration": "el-Müntekim",
+      "meaningTr": "Suçluları adaletle cezalandıran."
+    },
+    {
+      "no": 82,
+      "arabic": "العفو",
+      "transliteration": "el-Afüvv",
+      "meaningTr": "Affı çok olan, günahları silen."
+    },
+    {
+      "no": 83,
+      "arabic": "الرءوف",
+      "transliteration": "er-Raûf",
+      "meaningTr": "Çok şefkatli olan."
+    },
+    {
+      "no": 84,
+      "arabic": "مالك الملك",
+      "transliteration": "Mâlikü’l-mülk",
+      "meaningTr": "Mülkün ebedi sahibi."
+    },
+    {
+      "no": 85,
+      "arabic": "ذو الجلال والإكرام",
+      "transliteration": "Zü’l-celâli ve’l-ikrâm",
+      "meaningTr": "Celal, azamet ve ikram sahibi."
+    },
+    {
+      "no": 86,
+      "arabic": "المقسط",
+      "transliteration": "el-Muksit",
+      "meaningTr": "Adaletle hükmeden."
+    },
+    {
+      "no": 87,
+      "arabic": "الجامع",
+      "transliteration": "el-Câmi’",
+      "meaningTr": "Dilediğini dilediği zaman bir araya getiren."
+    },
+    {
+      "no": 88,
+      "arabic": "الغني",
+      "transliteration": "el-Ganiyy",
+      "meaningTr": "Zengin olan, hiçbir şeye ihtiyacı olmayan."
+    },
+    {
+      "no": 89,
+      "arabic": "المغني",
+      "transliteration": "el-Mugnî",
+      "meaningTr": "Dilediğini zengin kılan."
+    },
+    {
+      "no": 90,
+      "arabic": "المانع",
+      "transliteration": "el-Mâni’",
+      "meaningTr": "Dilediğine bir şeyi vermeyen, engelleyen."
+    },
+    {
+      "no": 91,
+      "arabic": "الضار",
+      "transliteration": "ed-Dârr",
+      "meaningTr": "Dilediğine zarar verecek şeyleri yaratan."
+    },
+    {
+      "no": 92,
+      "arabic": "النافع",
+      "transliteration": "en-Nâfi’",
+      "meaningTr": "Dilediğine fayda verecek şeyleri yaratan."
+    },
+    {
+      "no": 93,
+      "arabic": "النور",
+      "transliteration": "en-Nûr",
+      "meaningTr": "Âlemleri aydınlatan, nurlandıran."
+    },
+    {
+      "no": 94,
+      "arabic": "الهادي",
+      "transliteration": "el-Hâdî",
+      "meaningTr": "Hidayet veren, doğru yola ileten."
+    },
+    {
+      "no": 95,
+      "arabic": "البديع",
+      "transliteration": "el-Bedî’",
+      "meaningTr": "Eşi ve benzeri olmayan güzellikte yaratan."
+    },
+    {
+      "no": 96,
+      "arabic": "الباقي",
+      "transliteration": "el-Bâkî",
+      "meaningTr": "Varlığının sonu olmayan, baki olan."
+    },
+    {
+      "no": 97,
+      "arabic": "الوارث",
+      "transliteration": "el-Vâris",
+      "meaningTr": "Her şeyin asıl sahibi; mülk sonunda kendisine kalan."
+    },
+    {
+      "no": 98,
+      "arabic": "الرشيد",
+      "transliteration": "er-Reşîd",
+      "meaningTr": "Her işi yerinde olan, doğru yolu gösteren."
+    },
+    {
+      "no": 99,
+      "arabic": "الصبور",
+      "transliteration": "es-Sabûr",
+      "meaningTr": "Çok sabırlı olan, cezada acele etmeyen."
+    }
+  ]
+}

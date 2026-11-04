@@ -21,8 +21,17 @@ export async function configureApp(app: INestApplication): Promise<void> {
   }
   express.disable('x-powered-by');
   app.use(helmet());
+  // Only the listed web origins may call the API from a browser; credentials are
+  // allowed so the refresh cookie can be sent to /v1/auth.
   const origins = config.get('CORS_ORIGINS');
-  app.enableCors({ origin: origins.length > 0 ? origins : false, credentials: false });
+  app.enableCors({
+    origin: origins.length > 0 ? origins : false,
+    credentials: origins.length > 0,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Client-Platform', 'X-Request-Id'],
+    exposedHeaders: ['X-Request-Id', 'X-RateLimit-Remaining', 'Retry-After'],
+    maxAge: 600,
+  });
 
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.useGlobalPipes(
@@ -34,7 +43,7 @@ export async function configureApp(app: INestApplication): Promise<void> {
     }),
   );
 
-  const ioAdapter = new ChatIoAdapter(app);
+  const ioAdapter = new ChatIoAdapter(app, origins);
   await ioAdapter.connectToRedis(config.get('REDIS_URL'));
   app.useWebSocketAdapter(ioAdapter);
 

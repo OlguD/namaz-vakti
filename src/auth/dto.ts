@@ -113,10 +113,14 @@ export class ResetPasswordDto {
 }
 
 export class RefreshDto {
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description:
+      'Native apps send it here. Web clients omit it; the httpOnly cookie is used instead.',
+  })
+  @IsOptional()
   @IsString()
   @MaxLength(512)
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 export class TokenPairDto {

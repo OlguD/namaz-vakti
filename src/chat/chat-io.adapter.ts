@@ -12,7 +12,11 @@ export class ChatIoAdapter extends IoAdapter {
   private adapterConstructor?: ReturnType<typeof createAdapter>;
   private clients: Redis[] = [];
 
-  constructor(app: INestApplicationContext) {
+  constructor(
+    app: INestApplicationContext,
+    /** Browser origins allowed to open a socket (the web app). Native apps send no Origin. */
+    private readonly origins: string[] = [],
+  ) {
     super(app);
   }
 
@@ -27,7 +31,12 @@ export class ChatIoAdapter extends IoAdapter {
   override createIOServer(port: number, options?: ServerOptions): Server {
     const server = super.createIOServer(port, {
       ...(options as ServerOptions),
-      cors: { origin: false },
+      cors: { origin: this.origins.length > 0 ? this.origins : false },
+      // Reject browser handshakes from other sites even when they skip CORS (e.g. plain WebSocket).
+      allowRequest: (req, callback) => {
+        const origin = req.headers.origin;
+        callback(null, !origin || this.origins.includes(origin));
+      },
       pingInterval: 25_000,
       pingTimeout: 20_000,
       maxHttpBufferSize: 16 * 1024,

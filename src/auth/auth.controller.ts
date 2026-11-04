@@ -1,4 +1,14 @@
-import { Body, Controller, Headers, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UseInterceptors,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
 import {
   ApiBearerAuth,
   ApiNoContentResponse,
@@ -9,6 +19,8 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { type AuthUser, CurrentUser, Public } from './auth.decorators.js';
 import { AuthService } from './auth.service.js';
+import { WebSession, WebTokenInterceptor } from './web-session.js';
+import { AppError } from '../common/errors.js';
 import {
   AnonymousLoginDto,
   AppleLoginDto,
@@ -27,8 +39,12 @@ const STRICT = { default: { limit: 10, ttl: 60_000 } };
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
+@UseInterceptors(WebTokenInterceptor)
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly web: WebSession,
+  ) {}
 
   @Public()
   @Post('anonymous')
@@ -144,15 +160,38 @@ export class AuthController {
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Rotate the refresh token and get a new access token' })
   @ApiOkResponse({ type: TokenPairDto })
-  refresh(@Body() body: RefreshDto, @Headers('user-agent') ua?: string) {
-    return this.auth.refresh(body.refreshToken, ua);
+  async refresh(
+    @Body() body: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Headers('user-agent') ua?: string,
+  ) {
+    const token = this.web.refreshTokenFrom(req, body.refreshToken);
+    if (!token) {
+      throw AppError.unauthenticated('Refresh token missing');
+    }
+    try {
+      return await this.auth.refresh(token, ua);
+    } catch (error) {
+      // A dead cookie would otherwise be replayed on every page load.
+      this.web.clearRefreshCookie(res);
+      throw error;
+    }
   }
 
   @Public()
   @Post('logout')
   @HttpCode(204)
   @ApiNoContentResponse()
-  async logout(@Body() body: RefreshDto): Promise<void> {
-    await this.auth.logout(body.refreshToken);
+  async logout(
+    @Body() body: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    const token = this.web.refreshTokenFrom(req, body.refreshToken);
+    if (token) {
+      await this.auth.logout(token);
+    }
+    this.web.clearRefreshCookie(res);
   }
 }
