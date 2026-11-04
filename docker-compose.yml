@@ -1,0 +1,102 @@
+# Production-style stack. Local development only needs `docker compose up -d postgres redis`.
+#
+#   cp .env.example .env   # fill in secrets
+#   docker compose up -d --build
+#
+# Traefik: the api service joins the external `traefik` network and exposes
+# itself on ${API_DOMAIN}. Remove the labels/network if you route differently.
+
+name: namaz-vakti
+
+x-app: &app
+  build: .
+  image: namaz-vakti-backend:latest
+  env_file: .env
+  environment:
+    NODE_ENV: production
+    DATABASE_URL: postgres://${POSTGRES_USER:-vakit}:${POSTGRES_PASSWORD:-vakit}@postgres:5432/${POSTGRES_DB:-vakit}
+    REDIS_URL: redis://redis:6379/0
+    TRUST_PROXY: "true"
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vakit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vakit}
+      POSTGRES_DB: ${POSTGRES_DB:-vakit}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # AOF persistence: BullMQ jobs and schedules survive restarts.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redisdata:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    command: ["node", "dist/db/migrate.js"]
+    restart: "no"
+
+  api:
+    <<: *app
+    command: ["node", "dist/main.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    deploy:
+      replicas: 2
+    networks: [default, traefik]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.namaz-api.rule=Host(`${API_DOMAIN:-api.example.com}`)
+      - traefik.http.routers.namaz-api.entrypoints=websecure
+      - traefik.http.routers.namaz-api.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
+      - traefik.http.services.namaz-api.loadbalancer.server.port=3000
+      - traefik.http.services.namaz-api.loadbalancer.healthcheck.path=/health/ready
+      - traefik.http.services.namaz-api.loadbalancer.healthcheck.interval=10s
+      # Socket.IO falls back to long-polling; keep each client on one replica.
+      - traefik.http.services.namaz-api.loadbalancer.sticky.cookie=true
+      - traefik.http.services.namaz-api.loadbalancer.sticky.cookie.name=nv_lb
+
+  worker:
+    <<: *app
+    command: ["node", "dist/worker.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      disable: true
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  traefik:
+    external: true
