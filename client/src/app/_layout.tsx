@@ -8,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { persister, queryClient, setupQueryEnvironment, shouldPersist } from '@/api/query';
 import { bootSession } from '@/auth/session';
 import { hydratePlace } from '@/features/location/store';
+import { NotificationsBridge } from '@/features/notifications';
 import { hydrateFlags } from '@/lib/flags';
 import { FONT_ASSETS } from '@/theme/fonts';
 import { ThemeProvider, useTheme } from '@/theme/theme';
@@ -46,7 +47,16 @@ export default function RootLayout() {
           },
         }}
       >
-        <ThemeProvider>{ready ? <AppStack /> : <Blank />}</ThemeProvider>
+        <ThemeProvider>
+          {ready ? (
+            <>
+              <AppStack />
+              <NotificationsBridge />
+            </>
+          ) : (
+            <Blank />
+          )}
+        </ThemeProvider>
       </PersistQueryClientProvider>
     </SafeAreaProvider>
   );

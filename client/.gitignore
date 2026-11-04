@@ -16,3 +16,4 @@ android/
 coverage/
 *.tsbuildinfo
 .DS_Store
+shots/

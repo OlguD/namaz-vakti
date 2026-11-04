@@ -4,6 +4,7 @@ import { Linking, Platform, View } from 'react-native';
 import Svg, { Circle, G, Rect, Text as SvgText } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PlacePicker } from '@/features/location/PlacePicker';
+import { requestNotificationPermission } from '@/features/notifications';
 import { detectPlace, usePlace } from '@/features/location/store';
 import { usePrayerTimes } from '@/features/prayer/api';
 import { useSettings, useUpdateSettings } from '@/features/settings/api';
@@ -245,10 +246,7 @@ function NotifyStep({ onBack, onDone }: { onBack: () => void; onDone: (signIn: b
   async function allow() {
     setAsking(true);
     try {
-      if (Platform.OS !== 'web') {
-        const Notifications = await import('expo-notifications');
-        await Notifications.requestPermissionsAsync();
-      }
+      await requestNotificationPermission();
     } catch {
       // Denied or unavailable: the user can enable it later in Settings.
     } finally {
