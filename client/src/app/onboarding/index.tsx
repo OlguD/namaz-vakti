@@ -294,7 +294,7 @@ function NotifyStep({ onBack, onDone }: { onBack: () => void; onDone: (signIn: b
           Vakit bildirimleri
         </Txt>
         <Txt v="small" tone="secondary">
-          Sonradan Ayarlar'dan değişir
+          Sonradan Ayarlar’dan değişir
         </Txt>
       </View>
       <View style={{ marginTop: 8, paddingLeft: 16, paddingRight: 4, borderRadius: radius.xl, backgroundColor: c.raised, borderWidth: 1, borderColor: c.hair }}>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Easing, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { useReducedMotion } from '@/lib/a11y';
@@ -32,7 +32,7 @@ export function CountdownRing({
 }) {
   const { c } = useTheme();
   const reduced = useReducedMotion();
-  const breath = useRef(new Animated.Value(0)).current;
+  const breath = useState(() => new Animated.Value(0))[0];
   useEffect(() => {
     if (reduced) return;
     const loop = Animated.loop(

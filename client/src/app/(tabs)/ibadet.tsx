@@ -51,15 +51,15 @@ export default function IbadetScreen() {
       href: '/kuran',
       icon: 'kuran',
     },
-    { title: 'Dualar', sub: 'Sabah · akşam · yolculuk', href: '/dualar' as Href, icon: 'dua' },
-    { title: 'Esmaü’l-Hüsna', sub: '99 isim', href: '/esma' as Href, icon: 'esma' },
+    { title: 'Dualar', sub: 'Sabah · akşam · yolculuk', href: '/dualar', icon: 'dua' },
+    { title: 'Esmaü’l-Hüsna', sub: '99 isim', href: '/esma', icon: 'esma' },
     {
       title: 'Dini Günler',
       sub: holy.data ? `${holy.data.nameTr.replace(/ Kandili$/, '')} · ${Math.max(0, daysBetween(today, holy.data.date))} gün` : 'Kandiller · bayramlar',
-      href: '/dini-gunler' as Href,
+      href: '/dini-gunler',
       icon: 'gunler',
     },
-    { title: 'Zekât', sub: 'Hesaplayıcı', href: '/zekat' as Href, icon: 'zekat' },
+    { title: 'Zekât', sub: 'Hesaplayıcı', href: '/zekat', icon: 'zekat' },
   ];
 
   const ink = skyFor(sky).onDark ? dark : c;

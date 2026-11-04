@@ -9,6 +9,7 @@ import { persister, queryClient, setupQueryEnvironment, shouldPersist } from '@/
 import { bootSession } from '@/auth/session';
 import { hydratePlace } from '@/features/location/store';
 import { NotificationsBridge } from '@/features/notifications';
+import { useDhikrSync } from '@/features/worship/useDhikrSync';
 import { hydrateFlags } from '@/lib/flags';
 import { FONT_ASSETS } from '@/theme/fonts';
 import { ThemeProvider, useTheme } from '@/theme/theme';
@@ -69,6 +70,8 @@ function Blank() {
 
 function AppStack() {
   const { c } = useTheme();
+  // Upload queued dhikr counts from anywhere in the app, not only İbadet screens.
+  useDhikrSync();
   return (
     <Stack
       screenOptions={{

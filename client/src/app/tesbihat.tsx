@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { Link, useRouter, type Href } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, View } from 'react-native';
@@ -185,7 +185,7 @@ export default function TesbihatScreen() {
             <Txt v="sub" tone="sub">
               “Allah, O’ndan başka ilah yoktur; diridir, her şeyin varlığı O’na bağlıdır. O’nu ne uyuklama tutar ne de uyku. Göklerde ve yerde ne varsa O’nundur…”
             </Txt>
-            <Link href={'/dualar' as Href} asChild>
+            <Link href={'/dualar'} asChild>
               <Touch accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}>
                 <Txt v="subStrong" tone="gold">
                   Tamamını oku
@@ -193,7 +193,7 @@ export default function TesbihatScreen() {
               </Touch>
             </Link>
           </Glass>
-          <Link href={'/dualar' as Href} asChild>
+          <Link href={'/dualar'} asChild>
             <Touch accessibilityRole="link" accessibilityLabel="Namaz sonrası dua, Dualar · Namaz">
               <Glass radius={20} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <View style={{ width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: c.goldTint }}>

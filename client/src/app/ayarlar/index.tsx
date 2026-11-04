@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import * as Application from 'expo-application';
 import Constants from 'expo-constants';
-import { Link, useRouter, type Href } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Linking, Platform, View } from 'react-native';
 import { get } from '@/api/client';
@@ -89,7 +89,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       ) : (
-        <Link href={(registered ? '/profil' : { pathname: '/giris', params: { next: '/ayarlar' } }) as Href} asChild>
+        <Link href={registered ? '/profil' : { pathname: '/giris', params: { next: '/ayarlar' } }} asChild>
           <Touch
             accessibilityRole="button"
             accessibilityLabel={registered ? `Profil: ${user?.displayName ?? ''}` : 'Giriş yap veya kayıt ol'}
@@ -212,10 +212,10 @@ export default function SettingsScreen() {
             icon="block"
             title="Engellenen kullanıcılar"
             value={blocks.data ? String(blocks.data.length) : undefined}
-            onPress={() => router.push('/sohbet/engellenenler' as Href)}
+            onPress={() => router.push('/sohbet/engellenenler')}
           />
         ) : null}
-        <Row icon="shield" title="Topluluk kuralları" onPress={() => router.push({ pathname: '/sohbet', params: { kurallar: '1' } } as Href)} />
+        <Row icon="shield" title="Topluluk kuralları" onPress={() => router.push({ pathname: '/sohbet', params: { kurallar: '1' } })} />
         <Row icon="lock" title="Gizlilik politikası" onPress={() => void Linking.openURL(PRIVACY_URL)} accessibilityLabel="Gizlilik politikası, bağlantı" />
         <Row icon="book" title="Kullanım şartları" onPress={() => void Linking.openURL(TERMS_URL)} accessibilityLabel="Kullanım şartları, bağlantı" last />
       </Group>

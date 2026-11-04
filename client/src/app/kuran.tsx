@@ -1,4 +1,4 @@
-import { Link, useRouter, type Href } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -99,7 +99,7 @@ export default function QuranScreen() {
           <Txt v="sub" tone="secondary">
             Ortak hatim başlatmak ya da bir davete katılmak için giriş yapın. Kişisel hatminiz giriş yapmadan da kaydedilir.
           </Txt>
-          <Button compact kind="secondary" label="Giriş yap" onPress={() => router.push('/giris' as Href)} />
+          <Button compact kind="secondary" label="Giriş yap" onPress={() => router.push('/giris')} />
         </Glass>
       ) : hatims.isLoading ? (
         <Skeleton height={76} r={20} />

@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -65,7 +65,7 @@ export default function EsmaDetailScreen() {
         <Button
           label="Zikirmatikte çek"
           style={{ flex: 1, minHeight: 56 }}
-          onPress={() => router.push(`/zikir?esma=${n.no}` as Href)}
+          onPress={() => router.push(`/zikir?esma=${n.no}`)}
           accessibilityHint={`${n.transliteration} ismini zikirmatikte açar`}
         />
         <Touch onPress={() => go(1)} accessibilityRole="button" accessibilityLabel="Sonraki isim" style={navBtn(c)}>

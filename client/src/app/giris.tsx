@@ -1,4 +1,4 @@
-import { Redirect, useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
 import { PRIVACY_URL, TERMS_URL } from '@/api/config';
@@ -97,7 +97,7 @@ export default function SignInScreen() {
         <View style={{ flex: 1, height: 1, backgroundColor: c.hair }} />
       </View>
       <Touch
-        onPress={() => (router.canGoBack() ? router.back() : router.replace('/' as Href))}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
         accessibilityRole="button"
         style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: 10 }}
       >
