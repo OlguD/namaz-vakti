@@ -24,11 +24,22 @@ export const DEFAULT_SETTINGS: SettingsData = {
   zikirmatik: { lastDhikrKey: null, target: 33, view: 'ring', haptics: true, nightMode: false },
 };
 
+/**
+ * Last document confirmed by the server. Changes are applied on top of this,
+ * never on the optimistic cache copy (that would apply a toggle twice).
+ */
+let serverDoc: SettingsDocument | null = null;
+
+async function fetchSettings(): Promise<SettingsDocument> {
+  serverDoc = await get<SettingsDocument>('/me/settings');
+  return serverDoc;
+}
+
 export function useSettingsQuery() {
   const ready = useSession((s) => s.status !== 'booting');
   return useQuery({
     queryKey: settingsKey,
-    queryFn: () => get<SettingsDocument>('/me/settings'),
+    queryFn: fetchSettings,
     enabled: ready,
     staleTime: 5 * 60_000,
   });
@@ -49,22 +60,24 @@ type Patch = (current: SettingsData) => SettingsData;
 export function useUpdateSettings() {
   const qc = useQueryClient();
   return useMutation({
+    // Serialise settings writes so each one builds on the previous result.
+    scope: { id: 'settings' },
     mutationFn: async (change: Patch) => {
-      const doc = qc.getQueryData<SettingsDocument>(settingsKey);
-      const base = doc ?? (await get<SettingsDocument>('/me/settings'));
+      const base = serverDoc ?? (await fetchSettings());
       try {
-        return await put<SettingsDocument>('/me/settings', {
+        serverDoc = await put<SettingsDocument>('/me/settings', {
           version: base.version,
           data: change(base.data),
         });
       } catch (e) {
         const current = isApiError(e) && e.status === 409 ? conflictCurrent(e.details) : null;
         if (!current) throw e;
-        return put<SettingsDocument>('/me/settings', {
+        serverDoc = await put<SettingsDocument>('/me/settings', {
           version: current.version,
           data: change(current.data),
         });
       }
+      return serverDoc;
     },
     onMutate: async (change) => {
       await qc.cancelQueries({ queryKey: settingsKey });
