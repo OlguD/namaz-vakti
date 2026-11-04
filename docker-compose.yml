@@ -94,6 +94,29 @@ services:
     healthcheck:
       disable: true
 
+  # Web app (Expo web build behind nginx). Build args are compiled into the bundle.
+  web:
+    build:
+      context: ./client
+      args:
+        EXPO_PUBLIC_API_URL: https://${API_DOMAIN:-api.example.com}
+        EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
+        EXPO_PUBLIC_PRIVACY_URL: ${PRIVACY_URL:-}
+        EXPO_PUBLIC_TERMS_URL: ${TERMS_URL:-}
+    image: namaz-vakti-web:latest
+    restart: unless-stopped
+    environment:
+      API_ORIGIN: https://${API_DOMAIN:-api.example.com}
+      API_ORIGIN_WS: wss://${API_DOMAIN:-api.example.com}
+    networks: [traefik]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.namaz-web.rule=Host(`${APP_DOMAIN:-app.example.com}`)
+      - traefik.http.routers.namaz-web.entrypoints=websecure
+      - traefik.http.routers.namaz-web.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
+      - traefik.http.services.namaz-web.loadbalancer.server.port=8080
+
 volumes:
   pgdata:
   redisdata:

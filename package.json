@@ -24,6 +24,7 @@
     "db:studio": "drizzle-kit studio",
     "content:import": "node --env-file-if-exists=.env dist/content/import.js",
     "content:import:dev": "tsx --env-file-if-exists=.env src/content/import.ts",
+    "dev:upstream": "node scripts/dev-upstream.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",

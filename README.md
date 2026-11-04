@@ -71,6 +71,50 @@ npm run typecheck && npm run lint
 
 E2E testleri `vakit_test` veritabanını **sıfırlar**. Adında "test" geçmeyen bir veritabanına karşı çalışmayı reddeder.
 
+### Sahte dış servisler (internetsiz geliştirme)
+
+`scripts/dev-upstream.mjs` yalnızca geliştirme içindir. Emushaf, Nominatim, Overpass, YouTube, Aladhan, TCMB ve GoldAPI'yi tek bir lokal sunucuda taklit eder. Böylece internet yokken de uygulama gerçekçi verilerle geliştirilebilir ve ekran görüntüsü alınabilir. Sunulan veriler: 5 ülke (Türkiye'nin 81 ili, İstanbul'un 39 ilçesi, Almanya, Hollanda, KKTC, Suudi Arabistan), `adhan` ile Diyanet yöntemine göre hesaplanmış 30 günlük vakitler, Umm al-Qura hicri tarihler, her bölgede ~40+ cami (Süleymaniye, Sultan Ahmet gibi bilinen camiler gerçek konumlarında), canlı yayınlar, USD/TRY ≈ 42,5, ons altın ≈ 4000 $, ons gümüş ≈ 48 $.
+
+```bash
+npm run dev:upstream        # → http://localhost:4010 (PORT ile değiştirilebilir)
+```
+
+API'yi ve worker'ı şu değişkenlerle başlat (`.env` içine yazılabilir ya da komutun önüne eklenebilir; ortam değişkenleri `.env`'deki değerleri ezer):
+
+```bash
+EMUSHAF_BASE_URL=http://localhost:4010/emushaf
+NOMINATIM_BASE_URL=http://localhost:4010/nominatim
+OVERPASS_BASE_URL=http://localhost:4010/overpass/api/interpreter
+ALADHAN_BASE_URL=http://localhost:4010/aladhan
+TCMB_BASE_URL=http://localhost:4010/tcmb
+GOLDAPI_BASE_URL=http://localhost:4010/goldapi
+GOLDAPI_KEY=dev-mock
+YOUTUBE_API_KEY=dev-mock
+DEV_UPSTREAM_URL=http://localhost:4010
+NODE_OPTIONS=--import=./scripts/dev-upstream.mjs
+```
+
+YouTube adresleri kodda sabit olduğu için (`src/live/youtube.client.ts`) bunlar env ile değiştirilemez. `NODE_OPTIONS` satırı aynı dosyayı önyükleme olarak çalıştırır. Bu modda sunucu başlatılmaz, yalnızca `googleapis.com/youtube` ve `youtube.com/feeds` istekleri `DEV_UPSTREAM_URL`'e yönlendirilir. API **ve** worker bu satırla başlatılmalı. Komutlar repo kökünden çalıştırılmalı, çünkü yol göreceli.
+
+Notlar:
+
+- İlçe koordinatları worker'daki geocode kuyruğuyla saniyede bir dolar. Bu yüzden `/v1/locations/nearest` ve `/v1/prayer-times/nearby`, ilgili şehrin ilçe listesi bir kez açıldıktan birkaç saniye (İstanbul için ~45 sn) sonra çalışır.
+- Zekât fiyatları ve dini günler worker her açıldığında otomatik üretilir. Admin girişi gerekmez.
+- **Canlı yayın kanalları:** Veritabanında varsayılan kanal yoktur (seed ya da migration ile eklenmez). Normal yol `POST /v1/admin/live/channels` uç noktasıdır. Ancak admin girişi gerçek Google/Apple doğrulaması istediği için internetsiz ortamda kullanılamaz. Bu durumda kanalları doğrudan veritabanına ekle. Worker bir sonraki `live-poll` turunda (2 dk) yayınları çeker:
+
+  ```sql
+  INSERT INTO live_channels (youtube_channel_id, title, category, language, priority) VALUES
+    ('UCMekkeKabeCanliYayin_01', 'Mekke Canlı Yayın',        'haramain', 'ar', 30),
+    ('UCMedineMescidiNebevi_02', 'Medine Canlı Yayın',       'haramain', 'ar', 20),
+    ('UCKuranKerimTilavet_0003', 'Kur''an-ı Kerim Tilaveti', 'quran',    'tr', 10),
+    ('UCDiniSohbetVeDualar_004', 'Dini Sohbetler ve Dualar', 'sohbet',   'tr', 0)
+  ON CONFLICT (youtube_channel_id) DO NOTHING;
+  ```
+
+  Sahte sunucu her kanal kimliğini ya da `@handle`'ı kabul eder. Bilinmeyen kanallar bu dört katalog kanalından birine eşlenir. Sonuçta 4 canlı ve 2 yaklaşan yayın görünür. Küçük resimler `i.ytimg.com` adresli olduğu için internet yoksa yüklenmez.
+- Ay evresi görselleri (`moonPhaseUrl`) de dış adres gösterir ve internetsiz ortamda yüklenmez.
+- Sahte veriler normal veritabanına yazılır. Gerçek servislere geri dönünce `countries` / `cities` / `districts`, `prayer_times`, `mosques` / `mosque_tiles` ve `live_channels` tablolarını temizlemek gerekebilir.
+
 ### Production (Docker + Traefik)
 
 ```bash

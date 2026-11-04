@@ -8,3 +8,5 @@ coverage
 !.env.example
 test
 *.log
+client
+scripts

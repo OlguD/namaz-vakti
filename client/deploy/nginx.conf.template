@@ -1,0 +1,30 @@
+# nginx's envsubst fills ${API_ORIGIN} at container start.
+server {
+  listen 8080;
+  server_name _;
+  root /usr/share/nginx/html;
+  server_tokens off;
+
+  gzip on;
+  gzip_types text/css application/javascript application/json image/svg+xml;
+
+  add_header X-Content-Type-Options nosniff always;
+  add_header Referrer-Policy strict-origin-when-cross-origin always;
+  add_header X-Frame-Options DENY always;
+  add_header Permissions-Policy "geolocation=(self), camera=(), microphone=()" always;
+  add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+  # YouTube embeds for live streams, OSM tiles for the mosque map.
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https://*.ytimg.com https://*.tile.openstreetmap.org https://unpkg.com https://namazvakti.diyanet.gov.tr; font-src 'self' data:; connect-src 'self' ${API_ORIGIN} ${API_ORIGIN_WS} https://accounts.google.com https://oauth2.googleapis.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" always;
+
+  location = /healthz { access_log off; return 200 "ok"; }
+
+  # Hashed bundles never change: cache for a year.
+  location /_expo/ { expires 1y; add_header Cache-Control "public, immutable"; try_files $uri =404; }
+  location /assets/ { expires 1y; add_header Cache-Control "public, immutable"; try_files $uri =404; }
+
+  # Single-page app: unknown paths (deep links like /verify-email) get index.html.
+  location / {
+    add_header Cache-Control "no-cache";
+    try_files $uri /index.html;
+  }
+}
